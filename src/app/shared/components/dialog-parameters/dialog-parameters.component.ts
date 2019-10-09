@@ -308,4 +308,9 @@ export class DialogParametersComponent implements OnInit {
     //   }
     // }
   }
+
+  test(){
+
+  }
+  
 }

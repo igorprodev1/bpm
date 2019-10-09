@@ -2830,6 +2830,8 @@ var DialogParametersComponent = /** @class */ (function () {
         //   }
         // }
     };
+    DialogParametersComponent.prototype.test = function () {
+    };
     DialogParametersComponent = __decorate([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"])({
             selector: "app-dialog-parameters",
@@ -3220,7 +3222,7 @@ Object(_angular_platform_browser_dynamic__WEBPACK_IMPORTED_MODULE_1__["platformB
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! /home/shumik/Documents/mean/src/main.ts */"./src/main.ts");
+module.exports = __webpack_require__(/*! /home/shumik/Documents/bpm/src/main.ts */"./src/main.ts");
 
 
 /***/ })
