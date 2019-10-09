@@ -1,0 +1,39 @@
+<div class="wrap">
+  <div class="head">
+    <div class="df ai-c">
+      <div class="title">
+        Recently Active
+      </div>
+      <!-- <div class="subtitle">
+        Diagrams last changed by you
+      </div> -->
+    </div>
+    <div>
+      <button
+        (click)="openDialog()"
+        mat-raised-button
+        color="primary"
+      >
+        New project
+      </button>
+    </div>
+  </div>
+
+  <div class="model-list">
+    <div *ngFor="let item of data" class="model-wrap">
+      <div [routerLink]="['/model/'+item._id]" class="model">
+        <div class="img-wrap">
+          <img src="http://www.ucodice.com/kinglinkr/front/img/circle.png" alt="" />
+        </div>
+        <div>
+          <div class="name">
+            {{item.name}}
+          </div>
+          <div class="desc">
+            {{item.description}}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

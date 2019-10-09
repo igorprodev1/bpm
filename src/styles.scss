@@ -1,0 +1,259 @@
+/* You can add global styles to this file, and also import other style files */
+@import "~@angular/material/prebuilt-themes/deeppurple-amber.css";
+@import "~angular-tree-component/dist/angular-tree-component.css";
+@import "~@angular/material/theming";
+@import "~dragula/dist/dragula.css";
+@import "./assets/style.css";
+
+$custom-typography: mat-typography-config($font-family: "Exo"
+);
+
+@include mat-core($custom-typography);
+
+body {
+  min-height: 100vh;
+  background: #fafafa;
+  margin: 0;
+
+  app-root * {
+    font-family: "Exo", sans-serif;
+    box-sizing: border-box;
+  }
+}
+
+.container {
+  max-width: 1170px;
+  width: 100%;
+  margin: 0 auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+// helpers
+.m-r-10 {
+  margin-right: 10px !important;
+}
+
+.m-b-20 {
+  margin-bottom: 20px;
+}
+
+.m-t-10 {
+  margin-top: 10px;
+}
+
+.m-b-10 {
+  margin-bottom: 10px;
+}
+
+.df {
+  display: flex;
+}
+
+.ai-c {
+  align-items: center;
+}
+
+.jc-c {
+  justify-content: center;
+}
+
+.jc-b {
+  justify-content: space-between;
+}
+
+.full-width {
+  width: 100%;
+}
+
+// input
+.mat-form-field-appearance-legacy .mat-form-field-wrapper {
+  padding-bottom: 0.25em;
+}
+
+.mat-form-field-appearance-legacy .mat-form-field-underline {
+  bottom: 0.25em;
+}
+
+.foreignObject-input-bmp {
+  overflow: visible;
+  display: flex;
+  align-items: center;
+
+  input[type="number"] {
+    width: 100%;
+    height: 100%;
+    background: no-repeat;
+    border: none;
+    outline: none;
+    background: white;
+    border-radius: 2px;
+    box-shadow: 3px 3px 5px -2px #00000096;
+    position: relative;
+    top: 2px;
+    font-size: 12px;
+    padding: 3px;
+  }
+
+  input[type="range"] {
+    width: 100%;
+    height: 100%;
+    background: none;
+  }
+}
+
+mat-slider.bmp-slider {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+
+  .mat-slider-wrapper {
+    top: 9px;
+
+    .mat-slider-thumb {
+      right: -10px;
+      bottom: -5px;
+      width: 10px;
+      height: 10px;
+    }
+  }
+
+}
+
+// range slider
+.foreignObject-input-bmp input[type=range] {
+  -webkit-appearance: none;
+  width: 100%;
+  margin: 2.05px 0;
+}
+
+.foreignObject-input-bmp input[type=range]:focus {
+  outline: none;
+}
+
+.foreignObject-input-bmp input[type=range]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 3.9px;
+  cursor: pointer;
+  box-shadow: 0px 0px 1px #000000, 0px 0px 0px #0d0d0d;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 1.3px;
+  border: 0.8px solid rgba(1, 1, 1, 0.38);
+}
+
+.foreignObject-input-bmp input[type=range]::-webkit-slider-thumb {
+  box-shadow: 0.9px 0.9px 1px #000031, 0px 0px 0.9px #00004b;
+  border: 1.8px solid rgba(0, 0, 30, 0);
+  height: 8px;
+  width: 8px;
+  border-radius: 50px;
+  background: #ff0070;
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin-top: -2.85px;
+}
+
+.foreignObject-input-bmp input[type=range]:focus::-webkit-slider-runnable-track {
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.foreignObject-input-bmp input[type=range]::-moz-range-track {
+  width: 100%;
+  height: 3.9px;
+  cursor: pointer;
+  box-shadow: 0px 0px 1px #000000, 0px 0px 0px #0d0d0d;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 1.3px;
+  border: 0.8px solid rgba(1, 1, 1, 0.38);
+}
+
+.foreignObject-input-bmp input[type=range]::-moz-range-thumb {
+  box-shadow: 0.9px 0.9px 1px #000031, 0px 0px 0.9px #00004b;
+  border: 1.8px solid rgba(0, 0, 30, 0);
+  height: 8px;
+  width: 8px;
+  border-radius: 50px;
+  background: #ff0070;
+  cursor: pointer;
+}
+
+.foreignObject-input-bmp input[type=range]::-ms-track {
+  width: 100%;
+  height: 3.9px;
+  cursor: pointer;
+  background: transparent;
+  border-color: transparent;
+  color: transparent;
+}
+
+.foreignObject-input-bmp input[type=range]::-ms-fill-lower {
+  background: rgba(242, 242, 242, 0.95);
+  border: 0.8px solid rgba(1, 1, 1, 0.38);
+  border-radius: 2.6px;
+  box-shadow: 0px 0px 1px #000000, 0px 0px 0px #0d0d0d;
+}
+
+.foreignObject-input-bmp input[type=range]::-ms-fill-upper {
+  background: rgba(255, 255, 255, 0.95);
+  border: 0.8px solid rgba(1, 1, 1, 0.38);
+  border-radius: 2.6px;
+  box-shadow: 0px 0px 1px #000000, 0px 0px 0px #0d0d0d;
+}
+
+.foreignObject-input-bmp input[type=range]::-ms-thumb {
+  box-shadow: 0.9px 0.9px 1px #000031, 0px 0px 0.9px #00004b;
+  border: 1.8px solid rgba(0, 0, 30, 0);
+  height: 8px;
+  width: 8px;
+  border-radius: 50px;
+  background: #ff0070;
+  cursor: pointer;
+  height: 3.9px;
+}
+
+.foreignObject-input-bmp input[type=range]:focus::-ms-fill-lower {
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.foreignObject-input-bmp input[type=range]:focus::-ms-fill-upper {
+  background: rgba(255, 255, 255, 0.95);
+}
+
+mat-form-field.table-input {
+  width: 135px;
+
+  .mat-form-field-infix {
+    padding: 0px 0;
+    border-top: 0;
+  }
+
+  .mat-form-field-underline {
+    bottom: 0;
+  }
+}
+
+button.table-more-btn {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .mat-button-wrapper {
+    display: inherit;
+  }
+
+  .material-icons-outlined {
+    font-size: 20px;
+  }
+}
+
+.range-button{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  width: 10px;
+  height: 20px;
+}

@@ -1,0 +1,63 @@
+<h1 mat-dialog-title>Formula dialog</h1>
+<div mat-dialog-content>
+  <mat-form-field>
+    <mat-label>Model</mat-label>
+    <mat-select [(ngModel)]="sleectedModel" (ngModelChange)="modelChange($event)">
+      <mat-option *ngFor="let item of listModel" [value]="item._id">
+        {{item.name}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Class</mat-label>
+    <mat-select [(ngModel)]="selectedClass" (ngModelChange)="paramsFilter($event)">
+      <mat-option *ngFor="let item of listClass" [value]="item">
+        {{item}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Object</mat-label>
+    <mat-select [(ngModel)]="selectedObject" (ngModelChange)="paramsFilter($event)">
+      <mat-option *ngFor="let item of listObjects | filtrListParam: selectedClass" [value]="item.id">
+        {{item.name || item.id}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Parameter</mat-label>
+    <mat-select [(ngModel)]="selectedParam" (ngModelChange)="paramsChange($event)">
+      <mat-option *ngFor="let item of listParams | filtrListParam: selectedClass: selectedObject" [value]="item._id">
+        {{item.name || item.id}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <div class="textarea-wrap">
+    <div style="width: 60%; position: relative;">
+      <mat-form-field style="width: 100%" class="example-full-width">
+        <!-- (ngModelChange)="change($event)" -->
+        <textarea #textArea [(ngModel)]="formula" (ngModelChange)="change($event)" (keydown)="checkPattern($event)"
+          matInput></textarea>
+      </mat-form-field>
+      <div (click)="textArea.focus()" class="text-area-shield"></div>
+    </div>
+    <div style="width: 40%; padding: 20px 0 0 20px;">
+      <div class="full-width">
+        <!-- [disabled]="!boolLastOperator" -->
+        <button [matTooltip]="!boolLastOperator ? 'Before add math operator: +, -, *, /' : null" (click)="add()" class="full-width" mat-raised-button color="primary" mat-button>
+          <= ADD</button> </div> <div class="df jc-c">
+            <button (click)="test()" class="func" mat-raised-button color="primary" mat-button>
+              <i>
+                f(x)
+              </i>
+            </button>
+      </div>
+    </div>
+  </div>
+</div>
+<div mat-dialog-actions class="jc-c df">
+  <button mat-button (click)="ok()" mat-raised-button color="primary" cdkFocusInitial>
+    Ok
+  </button>
+  <button mat-button (click)="onNoClick()">Cancel</button>
+</div>
