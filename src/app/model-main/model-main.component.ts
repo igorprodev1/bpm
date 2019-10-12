@@ -55,6 +55,7 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
   setInterval;
   formulaSaverOld = {};
   saverComponent = [];
+  modelsKeys = {};
 
   constructor(
     private modelService: ModelService,
@@ -72,6 +73,9 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
           this.formulaData = data;
         });
         this.modelList = data;
+        this.modelList.forEach((model) => {
+          this.modelsKeys[model._id] = model.id;
+        })
         this.componentService.getAllById(this.modelId).subscribe((data: any) => {
           this.data = data;
           this.saverComponent = [JSON.parse(JSON.stringify( this.data ))];
@@ -79,6 +83,8 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
 
           this.calc();
           setTimeout(() => {
+            this.removeAll();
+            this.drowLines();
             this.drow();
           }, 1000);
         });
@@ -105,7 +111,6 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
           if (!model.drag) {
             this.componentService.getAllByUserId(this.user._id).subscribe((data: any) => {
               this.formulaData = data;
-              this.formulaSaverOld = Object.assign(this.formulaSaver, {});
               this.formulaSaver = {};
               this.calc();
             });
@@ -125,7 +130,6 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
         if (element.value) {
           let v = element.value;
           let spcaSpit = v.split(" ");
-
           spcaSpit.forEach((element, index) => {
             let earr = element.split(".");
             if (earr.length == 3) {
@@ -137,7 +141,6 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       });
     });
-
   }
 
   clear() {
@@ -168,18 +171,7 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
     // }
 
     if (event.keyCode === 90 && (event.ctrlKey || event.metaKey)) {
-      if (this.saverComponent) {
-        let arr = this.saverComponent[this.saverComponent.length - 2];
-        if (arr && this.saverComponent.length > 1) {
-          this.data = JSON.parse(JSON.stringify( arr ));
-          this.saverComponent.pop();
-          this.clear();
-          this.data.forEach(element => {
-            this.componentService.update(element).subscribe((data) => {
-            });
-          });
-        }
-      }
+      this.undo();
     }
 
     if (event.keyCode === 27) {
@@ -248,6 +240,30 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
     this.init();
   }
 
+  undo(){
+    if (this.saverComponent) {
+      let arr = this.saverComponent[this.saverComponent.length - 2];
+      if (arr && this.saverComponent.length > 1) {
+        this.data = JSON.parse(JSON.stringify( arr ));
+        this.saverComponent.pop();
+
+        this.data.forEach(element => {
+          this.componentService.update(element).subscribe((data) => {
+          });
+        });
+        this.componentService.getAllByUserId(this.user._id).subscribe((data: any) => {
+          this.formulaData = data;
+          this.formulaSaver = {};
+          this.calc();
+          // this.removeAll();
+          // this.drowLines();
+          // this.clear();
+          // this.drow();
+        });
+      }
+    }
+  }
+
   init() {
 
     this.menuInit();
@@ -301,6 +317,26 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
       .datum({})
       .attr("class", "coco-bpm-d3-zoom-wrap");
     let g1 = g;
+    let icon1 = g1
+    .append("svg")
+    .attr("width", "14")
+    .attr("height", "14")
+    .attr("viewBox", "0 0 14 14")
+    .on("click", () => {
+      this.undo();
+    })
+    .append("g")
+    .attr("fill", "#2196F3")
+    .attr("transform", "translate(-384.000000, -144.000000)")
+    .attr("fill-rule", "nonzero");
+
+    icon1
+      .append("path")
+      .attr(
+        "d",
+        "M391.5,157 C389.014719,157 387,154.985281 387,152.5 C387,152.331018 387.009314,152.164211 387.027464,152 L385.018945,152 C385.00639,152.165053 385,152.33178 385,152.5 C385,156.089851 387.910149,159 391.5,159 C395.089851,159 398,156.089851 398,152.5 C398,149.078368 395.356198,146.27423 392,146.018945 L392,148.027464 C394.249941,148.27615 396,150.183701 396,152.5 C396,154.985281 393.985281,157 391.5,157 L391.5,157 Z M388,147 L392,150 L392,144 L388,147 L388,147 Z M388,147"
+      );
+
     let icon = g1
       .append("svg")
       .attr("width", "14")
@@ -473,9 +509,9 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
         model.modelId = this.modelId;
         model.userId = this.user._id;
         model.id = this.dragType + (this.data.filter(value => value.objectClass === this.dragType).length + 1);
-        let p1 = new ParameterClass("Price" + model.id, "Price", "0", 1);
-        let p2 = new ParameterClass("Speed" + model.id, "Speed", "0", 1);
-        let p3 = new ParameterClass("CostPrice" + model.id, "CostPrice", "0", 1);
+        let p1 = new ParameterClass("Cost", "Cost", "0", 1);
+        let p2 = new ParameterClass("Rate", "Rate", "0", 1);
+        let p3 = new ParameterClass("Price", "Price", "0", 1);
         model.parameters = [p1, p2, p3];
         this.componentService.create(model).subscribe((data) => {
           this.saverComponent.push(JSON.parse(JSON.stringify( this.data )));
@@ -513,7 +549,7 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
           });
 
           let h = (60 + (count > 3 ? ((count - 3) * 16 + (count * 5)) : 0));
-          let selected = +this.selected === +index ? "stroke-width:1;stroke:rgb(0,0,0)" : "";
+          let selected = (this.selected !== null && (+this.selected === +index)) ? "stroke-width:1;stroke:rgb(0,0,0)" : "";
           let g = this.conteiner.append("g").attr("class", "g");
           g.append("rect")
             .attr("class", "nodes")
@@ -548,22 +584,19 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
             })
             .on("click", (d, i, s) => {
               d3.event.stopPropagation();
-              this.selected = s[0].id;
-              this.removeAll();
-              this.drow();
               if (this.activeArrow)
                 this.shepClick(s[0].id);
             })
             .on("dblclick", (d, i, s) => {
               this.selectedModal = s[0].id;
               let name = this.data[this.selectedModal].objectClass + (this.data[this.selectedModal].parameters.length + 1);
-              this.newParametr = new ParameterClass("Par" + (this.data.filter(value => value.objectClass === this.data[this.selectedModal].objectClass).length + 1) + name, "", "0")
+              this.newParametr = new ParameterClass("Par" + (this.data.filter(value => value.objectClass === this.data[this.selectedModal].objectClass).length + 1), "", "0")
               this.showSide = true;
+              this.selected = s[0].id;
               this.removeAll();
               this.drow();
               this.activeArrow = null;
               this.startDrowLine = null;
-              this.selected = null;
             });
 
           g.append("text")
@@ -637,11 +670,7 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
                     spcaSpit.forEach((element, index) => {
                       let earr = element.split(".");
                       if (earr.length == 3) {
-                        if (this.formulaSaver[earr[2]]) {
-                          spcaSpit[index] = this.formulaSaver[earr[2]];
-                        } else {
                           spcaSpit[index] = this.formulaSaver[element];
-                        }
                       }
                     });
                     spcaSpit.shift();
@@ -654,25 +683,26 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
                     g.append("text")
                       .attr("x", element.x + 20)
                       .attr("y", py)
-                      .text((param.name || param.id) + " - " + (this.formulaSaver[param.id] || (this.formulaSaverOld[param.id] || "")));
+                      .text((param.name || param.id) + " - " + (parseFloat(this.formulaSaver[param.id] || (this.formulaSaverOld[param.id]) || "").toFixed(1)));
 
                   } else {
                     g.append("text")
                       .attr("x", element.x + 20)
                       .attr("y", py)
-                      .text((param.name || param.id) + " - " + (v || ""));
+                      .text((param.name || param.id) + " - " + parseFloat(v || "").toFixed(1));
                   }
 
                   break;
                 case "Input":
                   let gI = g.append("g");
                   gI.append("text")
-                    .attr("x", element.x)
+                    .attr("x", element.x + 15)
                     .attr("y", py)
                     .text((param.name || param.id) + " - ");
+                  let l = (param.name || param.id).length;
                   gI.append("foreignObject")
-                    .attr("x", element.x + ((param.name || param.id).length * 11))
-                    .attr("y", py - 15)
+                    .attr("x", element.x + (l < 7 ? l * 9 : l * 7) + 15)
+                    .attr("y", py - 13)
                     .attr("width", 50)
                     .attr("height", 16)
                     .attr("class", "foreignObject-input-bmp")
@@ -681,7 +711,7 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
                     });
                   let inputElement: any = document.getElementById(`${index}-${paramIndex}`);
                   let self = this;
-                  inputElement.onkeypress = function (e) {
+                  inputElement.onchange = function (e) {
                     setTimeout(() => {
                       self.dragSelected = index;
                       self.data[index].parameters[paramIndex].value = inputElement.value.toString();
@@ -698,9 +728,10 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
                   //   .attr("x", element.x)
                   //   .attr("y", py)
                   //   .text((param.name || param.id) + " - ");
+                   l = (param.name || param.id).length;
                   gR.append("foreignObject")
-                    .attr("x", element.x + ((param.name || param.id).length * 10) - 50)
-                    .attr("y", py - 15)
+                    .attr("x", element.x + ((param.name || param.id).length) + 5)
+                    .attr("y", py - 10)
                     .attr("width", 120)
                     .attr("height", 16)
                     .attr("class", "foreignObject-input-bmp")
@@ -720,27 +751,29 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
                     });
                   gR.append("text")
                     .attr("font-size", "10px")
-                    .attr("x", element.x + 40)
-                    .attr("y", py - 10)
+                    .attr("x", element.x + 50)
+                    .attr("y", py - 6)
                     .text((param.name || param.id) + "-" + (param.value));
 
                   self = this;
                   let rangeElement: any = document.getElementById(`${index}-${paramIndex}`);
-                  rangeElement.onchange = function (e) {
+                  rangeElement.onchange =  (e) => {
                     setTimeout(() => {
-                      self.dragSelected = index;
-                      self.data[index].parameters[paramIndex].value = rangeElement.value.toString();
-                      self.txtQueryChanged.next({
+                      console.log(22);   this.dragSelected = index;
+                      this.data[index].parameters[paramIndex].value = rangeElement.value.toString();
+                      this.txtQueryChanged.next({
                         value: rangeElement.value,
-                        selected: self.dragSelected
+                        selected: this.dragSelected
                       });
-                    }, 500);
+                    }, 150);
                   };
 
                   let rangeElementleft: any = document.getElementById(`${index}-${paramIndex}-left`);
                   rangeElementleft.onclick = function (e) {
+                    
                     setTimeout(() => {
-                      let value = +rangeElement.value - +param.sliderStep;
+                    console.log(2);
+                    let value = +rangeElement.value - +param.sliderStep;
                       if (value > param.sliderMin) {
                         self.dragSelected = index;
                         self.data[index].parameters[paramIndex].value = value.toString();
@@ -749,7 +782,7 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
                           selected: self.dragSelected
                         });
                       }
-                    }, 200);
+                    }, 20);
                   };
 
                   let rangeElementright: any = document.getElementById(`${index}-${paramIndex}-right`);
@@ -764,7 +797,7 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
                           selected: self.dragSelected
                         });
                       }
-                    }, 200);
+                    }, 20);
                   };
                   break;
                 default:
@@ -830,16 +863,17 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
         // self.start_y + (d3.event.y - self.start_y) / current_scale;
         self.removeAll();
         self.drow();
-        self.txtQueryChanged.next({
-          value: self.zoomTrans,
-          selected: self.dragSelected,
-          drag: 1
-        });
+
 
       }
 
       function dragended(d) {
         d3.select(this).classed("active", false);
+        self.txtQueryChanged.next({
+          value: self.zoomTrans,
+          selected: self.dragSelected,
+          drag: 1
+        });
       }
     });
   }
@@ -864,7 +898,7 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
   formulaDataSearch(data, arr, element) {
     data.forEach(comp => {
       comp.parameters.forEach(param => {
-        if (param.id === arr[2]) {
+        if (this.modelsKeys[comp.modelId] === arr[0] && comp.id === arr[1] && param.id === arr[2]) {
           this.formulaSaver[element] = param.value;
         }
       });

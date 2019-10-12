@@ -29,12 +29,6 @@ cd mean
 cp .env.example .env
 docker-compose up -d
 ```
-
-### Build 
-``` 
-ng build create /dist for web
-need deploy all folders
-```
 ### Credits 
 - The MEAN name was coined by Valeri Karpov.
 - Initial concept and development was done by Amos Haviv and sponsered by Linnovate.
