@@ -47,7 +47,7 @@ const config = {
 //  JWT_SECRET=0a6b944d-d2fb-46fc-a85e-0295c986cd9g               
 //   MONGO_HOST=mongodb://localhost:27017/cogintech                                                                          
 //   MEAN_FRONTEND=angular 
-  port: process.env.PORT,
+  port: 4040,
   mongooseDebug: envVars.MONGOOSE_DEBUG,
   jwtSecret: envVars.JWT_SECRET,
   frontend: envVars.MEAN_FRONTEND || 'angular',
