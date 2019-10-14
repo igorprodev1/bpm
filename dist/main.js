@@ -1939,6 +1939,7 @@ var ModelMainComponent = /** @class */ (function () {
                     parameters.forEach(function (param, paramIndex) {
                         if (param.showOnDiagram) {
                             var py = element.y + 70 - 50 - (countIndex_1 * 20) + (count_1 >= 3 ? ((count_1 - 3) * 16 + (count_1 * 7)) : (count_1 > 1) ? (count_1 * 4) : -9);
+                            // console.log(this.formulaSaver )
                             switch (param.controlType) {
                                 case "Value":
                                 case "":
@@ -1952,8 +1953,10 @@ var ModelMainComponent = /** @class */ (function () {
                                             }
                                         });
                                         spcaSpit_1.shift();
+                                        console.log(111, element, param, _this.modelsKeys);
+                                        console.log(222, _this.modelsKeys[element.modelId] + "." + element.id + "." + param.id);
                                         try {
-                                            _this.formulaSaver[param.id] = _this.notEval(spcaSpit_1.join(''));
+                                            _this.formulaSaver[_this.modelsKeys[element.modelId] + "." + element.id + "." + param.id] = _this.notEval(spcaSpit_1.join(''));
                                         }
                                         catch (_a) {
                                             _this.calc();
@@ -1961,7 +1964,7 @@ var ModelMainComponent = /** @class */ (function () {
                                         g_1.append("text")
                                             .attr("x", element.x + 20)
                                             .attr("y", py)
-                                            .text((param.name || param.id) + " - " + (parseFloat(_this.formulaSaver[param.id] || (_this.formulaSaverOld[param.id]) || "").toFixed(1)));
+                                            .text((param.name || param.id) + " - " + (parseFloat(_this.formulaSaver[_this.modelsKeys[element.modelId] + "." + element.id + "." + param.id] || "").toFixed(1)));
                                     }
                                     else {
                                         g_1.append("text")
@@ -2024,7 +2027,6 @@ var ModelMainComponent = /** @class */ (function () {
                                     var rangeElement_1 = document.getElementById(index + "-" + paramIndex);
                                     rangeElement_1.onchange = function (e) {
                                         setTimeout(function () {
-                                            console.log(22);
                                             _this.dragSelected = index;
                                             _this.data[index].parameters[paramIndex].value = rangeElement_1.value.toString();
                                             _this.txtQueryChanged.next({
@@ -2036,7 +2038,6 @@ var ModelMainComponent = /** @class */ (function () {
                                     var rangeElementleft = document.getElementById(index + "-" + paramIndex + "-left");
                                     rangeElementleft.onclick = function (e) {
                                         setTimeout(function () {
-                                            console.log(2);
                                             var value = +rangeElement_1.value - +param.sliderStep;
                                             if (value > param.sliderMin) {
                                                 self_1.dragSelected = index;
@@ -2146,7 +2147,7 @@ var ModelMainComponent = /** @class */ (function () {
         data.forEach(function (comp) {
             comp.parameters.forEach(function (param) {
                 if (_this.modelsKeys[comp.modelId] === arr[0] && comp.id === arr[1] && param.id === arr[2]) {
-                    _this.formulaSaver[element] = param.value;
+                    _this.formulaSaver[element] = +param.value;
                 }
             });
         });

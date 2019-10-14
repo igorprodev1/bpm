@@ -659,6 +659,7 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
           parameters.forEach((param, paramIndex) => {
             if (param.showOnDiagram) {
               let py = element.y + 70 - 50 - (countIndex * 20) + (count >= 3 ? ((count - 3) * 16 + (count * 7)) : (count > 1) ? (count * 4) : -9);
+              // console.log(this.formulaSaver )
               switch (param.controlType) {
                 case "Value":
                 case "":
@@ -674,8 +675,11 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
                       }
                     });
                     spcaSpit.shift();
+                    console.log(111, element, param, this.modelsKeys);
+                    console.log(222, this.modelsKeys[element.modelId] + "." + element.id + "." + param.id);
+                    
                     try {
-                      this.formulaSaver[param.id] = this.notEval(spcaSpit.join(''));
+                      this.formulaSaver[this.modelsKeys[element.modelId] + "." + element.id + "." + param.id] = this.notEval(spcaSpit.join(''));
                     } catch {
                       this.calc();
                     }
@@ -683,7 +687,7 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
                     g.append("text")
                       .attr("x", element.x + 20)
                       .attr("y", py)
-                      .text((param.name || param.id) + " - " + (parseFloat(this.formulaSaver[param.id] || (this.formulaSaverOld[param.id]) || "").toFixed(1)));
+                      .text((param.name || param.id) + " - " + (parseFloat(this.formulaSaver[this.modelsKeys[element.modelId] + "." + element.id + "." + param.id] || "").toFixed(1)));
 
                   } else {
                     g.append("text")
@@ -759,7 +763,7 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
                   let rangeElement: any = document.getElementById(`${index}-${paramIndex}`);
                   rangeElement.onchange =  (e) => {
                     setTimeout(() => {
-                      console.log(22);   this.dragSelected = index;
+                      this.dragSelected = index;
                       this.data[index].parameters[paramIndex].value = rangeElement.value.toString();
                       this.txtQueryChanged.next({
                         value: rangeElement.value,
@@ -772,7 +776,6 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
                   rangeElementleft.onclick = function (e) {
                     
                     setTimeout(() => {
-                    console.log(2);
                     let value = +rangeElement.value - +param.sliderStep;
                       if (value > param.sliderMin) {
                         self.dragSelected = index;
@@ -899,7 +902,7 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
     data.forEach(comp => {
       comp.parameters.forEach(param => {
         if (this.modelsKeys[comp.modelId] === arr[0] && comp.id === arr[1] && param.id === arr[2]) {
-          this.formulaSaver[element] = param.value;
+          this.formulaSaver[element] = +param.value;
         }
       });
     });
