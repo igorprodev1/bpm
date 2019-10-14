@@ -154,6 +154,7 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
     this.startDrowLine = null;
     this.removeAll();
     this.drowLines();
+    console.log(8)
     this.drow();
   }
 
@@ -528,6 +529,8 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
   drow() {
     this.drowLines();
 
+    console.log(2323)
+
     this.data.forEach((element, index, arr) => {
       switch (element.objectClass) {
         case "Input":
@@ -636,16 +639,6 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
             .attr("x", element.x)
             .attr("y", element.y + 5)
             .text("|||")
-            .on("click", (d, i, s) => {
-              d3.event.stopPropagation();
-              let id = s[0].id.split("-")[0];
-              this.saverComponent.push(JSON.parse(JSON.stringify( this.data )));
-              this.componentService.delete(this.data[id]).subscribe((data) => {
-                this.data.splice(id, 1);
-
-                this.clear();
-              });
-            })
             .call(
               d3
                 .drag()
@@ -659,7 +652,6 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
           parameters.forEach((param, paramIndex) => {
             if (param.showOnDiagram) {
               let py = element.y + 70 - 50 - (countIndex * 20) + (count >= 3 ? ((count - 3) * 16 + (count * 7)) : (count > 1) ? (count * 4) : -9);
-              // console.log(this.formulaSaver )
               switch (param.controlType) {
                 case "Value":
                 case "":
@@ -675,9 +667,6 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
                       }
                     });
                     spcaSpit.shift();
-                    console.log(111, element, param, this.modelsKeys);
-                    console.log(222, this.modelsKeys[element.modelId] + "." + element.id + "." + param.id);
-                    
                     try {
                       this.formulaSaver[this.modelsKeys[element.modelId] + "." + element.id + "." + param.id] = this.notEval(spcaSpit.join(''));
                     } catch {
@@ -733,6 +722,7 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
                   //   .attr("y", py)
                   //   .text((param.name || param.id) + " - ");
                    l = (param.name || param.id).length;
+                   console.log(param)
                   gR.append("foreignObject")
                     .attr("x", element.x + ((param.name || param.id).length) + 5)
                     .attr("y", py - 10)
@@ -745,8 +735,8 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
                       <input id="${index}-${paramIndex}-left" class="range-button" type="button" value="<">
                       </input>
                       <input id="${index}-${paramIndex}" type="range" 
-                      min="${param.sliderMin}" max="${param.sliderMax}" 
-                      step="${param.Step}" value="${param.value}" />
+                      min="${+param.sliderMin - 1}" max="${+param.sliderMax + 1}" 
+                      step="${param.sliderStep}" value="${param.value}" />
                       <input id="${index}-${paramIndex}-right" class="range-button" type="button" value=">">
                       </input>
                       </div>
@@ -757,7 +747,7 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
                     .attr("font-size", "10px")
                     .attr("x", element.x + 50)
                     .attr("y", py - 6)
-                    .text((param.name || param.id) + "-" + (param.value));
+                    .text((param.name || param.id) + "-" + parseFloat(param.value || "").toFixed(1));
 
                   self = this;
                   let rangeElement: any = document.getElementById(`${index}-${paramIndex}`);
@@ -777,7 +767,7 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
                     
                     setTimeout(() => {
                     let value = +rangeElement.value - +param.sliderStep;
-                      if (value > param.sliderMin) {
+                      if (value >= param.sliderMin) {
                         self.dragSelected = index;
                         self.data[index].parameters[paramIndex].value = value.toString();
                         self.txtQueryChanged.next({
@@ -792,7 +782,7 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
                   rangeElementright.onclick = function (e) {
                     setTimeout(() => {
                       let value = +rangeElement.value + +param.sliderStep;
-                      if (value < param.sliderMax) {
+                      if (value <= param.sliderMax) {
                         self.dragSelected = index;
                         self.data[index].parameters[paramIndex].value = value.toString();
                         self.txtQueryChanged.next({
@@ -906,8 +896,9 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       });
     });
-
-    this.clear();
+    setTimeout(() => {
+      this.clear();
+    }, 200);
   }
 
   clickArrow;

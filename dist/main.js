@@ -1514,6 +1514,7 @@ var ModelMainComponent = /** @class */ (function () {
         this.startDrowLine = null;
         this.removeAll();
         this.drowLines();
+        console.log(8);
         this.drow();
     };
     ModelMainComponent.prototype.keyEvent = function (event) {
@@ -1827,6 +1828,7 @@ var ModelMainComponent = /** @class */ (function () {
     ModelMainComponent.prototype.drow = function () {
         var _this = this;
         this.drowLines();
+        console.log(2323);
         this.data.forEach(function (element, index, arr) {
             switch (element.objectClass) {
                 case "Input":
@@ -1920,15 +1922,6 @@ var ModelMainComponent = /** @class */ (function () {
                         .attr("x", element.x)
                         .attr("y", element.y + 5)
                         .text("|||")
-                        .on("click", function (d, i, s) {
-                        d3.event.stopPropagation();
-                        var id = s[0].id.split("-")[0];
-                        _this.saverComponent.push(JSON.parse(JSON.stringify(_this.data)));
-                        _this.componentService.delete(_this.data[id]).subscribe(function (data) {
-                            _this.data.splice(id, 1);
-                            _this.clear();
-                        });
-                    })
                         .call(d3
                         .drag()
                         .on("start", dragstarted)
@@ -1939,7 +1932,6 @@ var ModelMainComponent = /** @class */ (function () {
                     parameters.forEach(function (param, paramIndex) {
                         if (param.showOnDiagram) {
                             var py = element.y + 70 - 50 - (countIndex_1 * 20) + (count_1 >= 3 ? ((count_1 - 3) * 16 + (count_1 * 7)) : (count_1 > 1) ? (count_1 * 4) : -9);
-                            // console.log(this.formulaSaver )
                             switch (param.controlType) {
                                 case "Value":
                                 case "":
@@ -1953,8 +1945,6 @@ var ModelMainComponent = /** @class */ (function () {
                                             }
                                         });
                                         spcaSpit_1.shift();
-                                        console.log(111, element, param, _this.modelsKeys);
-                                        console.log(222, _this.modelsKeys[element.modelId] + "." + element.id + "." + param.id);
                                         try {
                                             _this.formulaSaver[_this.modelsKeys[element.modelId] + "." + element.id + "." + param.id] = _this.notEval(spcaSpit_1.join(''));
                                         }
@@ -2009,6 +1999,7 @@ var ModelMainComponent = /** @class */ (function () {
                                     //   .attr("y", py)
                                     //   .text((param.name || param.id) + " - ");
                                     l = (param.name || param.id).length;
+                                    console.log(param);
                                     gR.append("foreignObject")
                                         .attr("x", element.x + ((param.name || param.id).length) + 5)
                                         .attr("y", py - 10)
@@ -2016,13 +2007,13 @@ var ModelMainComponent = /** @class */ (function () {
                                         .attr("height", 16)
                                         .attr("class", "foreignObject-input-bmp")
                                         .html(function (d) {
-                                        return "\n                      <div style=\"display:flex;align-items: center;\">\n                      <input id=\"" + index + "-" + paramIndex + "-left\" class=\"range-button\" type=\"button\" value=\"<\">\n                      </input>\n                      <input id=\"" + index + "-" + paramIndex + "\" type=\"range\" \n                      min=\"" + param.sliderMin + "\" max=\"" + param.sliderMax + "\" \n                      step=\"" + param.Step + "\" value=\"" + param.value + "\" />\n                      <input id=\"" + index + "-" + paramIndex + "-right\" class=\"range-button\" type=\"button\" value=\">\">\n                      </input>\n                      </div>\n                \n                      ";
+                                        return "\n                      <div style=\"display:flex;align-items: center;\">\n                      <input id=\"" + index + "-" + paramIndex + "-left\" class=\"range-button\" type=\"button\" value=\"<\">\n                      </input>\n                      <input id=\"" + index + "-" + paramIndex + "\" type=\"range\" \n                      min=\"" + (+param.sliderMin - 1) + "\" max=\"" + (+param.sliderMax + 1) + "\" \n                      step=\"" + param.sliderStep + "\" value=\"" + param.value + "\" />\n                      <input id=\"" + index + "-" + paramIndex + "-right\" class=\"range-button\" type=\"button\" value=\">\">\n                      </input>\n                      </div>\n                \n                      ";
                                     });
                                     gR.append("text")
                                         .attr("font-size", "10px")
                                         .attr("x", element.x + 50)
                                         .attr("y", py - 6)
-                                        .text((param.name || param.id) + "-" + (param.value));
+                                        .text((param.name || param.id) + "-" + parseFloat(param.value || "").toFixed(1));
                                     self_1 = _this;
                                     var rangeElement_1 = document.getElementById(index + "-" + paramIndex);
                                     rangeElement_1.onchange = function (e) {
@@ -2039,7 +2030,7 @@ var ModelMainComponent = /** @class */ (function () {
                                     rangeElementleft.onclick = function (e) {
                                         setTimeout(function () {
                                             var value = +rangeElement_1.value - +param.sliderStep;
-                                            if (value > param.sliderMin) {
+                                            if (value >= param.sliderMin) {
                                                 self_1.dragSelected = index;
                                                 self_1.data[index].parameters[paramIndex].value = value.toString();
                                                 self_1.txtQueryChanged.next({
@@ -2053,7 +2044,7 @@ var ModelMainComponent = /** @class */ (function () {
                                     rangeElementright.onclick = function (e) {
                                         setTimeout(function () {
                                             var value = +rangeElement_1.value + +param.sliderStep;
-                                            if (value < param.sliderMax) {
+                                            if (value <= param.sliderMax) {
                                                 self_1.dragSelected = index;
                                                 self_1.data[index].parameters[paramIndex].value = value.toString();
                                                 self_1.txtQueryChanged.next({
@@ -2151,7 +2142,9 @@ var ModelMainComponent = /** @class */ (function () {
                 }
             });
         });
-        this.clear();
+        setTimeout(function () {
+            _this.clear();
+        }, 200);
     };
     ModelMainComponent.prototype.drowLines = function () {
         var _this = this;
