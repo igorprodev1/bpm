@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from "@angular/core";
+import { Component, OnInit, Inject, ChangeDetectorRef, ViewChild, AfterViewInit, ElementRef } from "@angular/core";
 import { MatDialogRef } from "@angular/material/dialog";
 import { MAT_DIALOG_DATA } from '@angular/material';
 import { ComponentService } from "../../component.service";
@@ -8,7 +8,7 @@ import { ComponentService } from "../../component.service";
   templateUrl: "./dialog-parameters.component.html",
   styleUrls: ["./dialog-parameters.component.scss"]
 })
-export class DialogParametersComponent implements OnInit {
+export class DialogParametersComponent implements OnInit, AfterViewInit {
 
   listModel = [];
   listComponents = [];
@@ -20,15 +20,89 @@ export class DialogParametersComponent implements OnInit {
   selectedClass;
   sleectedModel;
   constructor(public dialogRef: MatDialogRef<DialogParametersComponent>,
-    private componentService: ComponentService,
+    private componentService: ComponentService, private chRef: ChangeDetectorRef,
     @Inject(MAT_DIALOG_DATA) public data: any) { }
+  @ViewChild("textArea") textArea: ElementRef;
 
   ngOnInit(): void {
     this.listModel = this.data.list;
     // this.formula = this.data.formula;
-    this.formula = this.data.formula.charAt(0) !== '=' ? ("=" + this.data.formula) : this.data.formula;
+    this.formula = this.data.formula.charAt(0) !== '=' ? this.data.formula : this.data.formula.slice(2); 
+    this.formulaArr = this.formula.split(' ');
+    if (this.formulaArr.length === 1 && this.formulaArr[0] === "0") {
+      this.formulaArr = [];
+    }
+
     this.sleectedModel = this.data.modelId;
     this.modelChange(this.sleectedModel);
+  }
+
+  ngAfterViewInit() {
+    setTimeout(() => {
+      if (!this.formulaArr.length) {
+        this.formulaArr = ["|"];
+        this.formulaIndex = this.formulaArr.length - 1;
+      } else {
+        this.formulaIndex = this.formulaArr.length;
+        this.formulaArr.splice(this.formulaIndex, 0, "|");
+      }
+      this.textArea.nativeElement.focus();
+      this.chRef.detectChanges();
+    }, 500);
+  }
+
+  formulaData = "";
+  formulaArr;
+  formulaIndex;
+  formulaItemClick(item, i){
+    let fiend = this.formulaArr.indexOf("|");
+    if(fiend > -1 && fiend < i ){
+      i--
+    }
+    this.removeSpace();
+    this.formulaIndex = i ;
+    this.formulaArr.splice(i, 0, "|");
+  }
+
+  removeSpace(){
+    this.formulaArr.forEach((e, i) => {
+      if(e === "|") {
+        this.formulaArr.splice(i, 1);
+      }
+    });
+  }
+
+  keyFormula(e) {
+    // backspace
+      if ((e.keyCode === 8 || e.keyCode === 46)) {
+        this.formulaArr.splice(this.formulaIndex - 1 , 1);
+        this.formulaIndex--;
+      }
+  }
+
+  changeForumula(e) {
+    let char = e.substr(e.length - 1);
+    console.log(e)
+    if (this.reOperator.test(char)) {
+      this.formulaArr.splice(this.formulaIndex, 0, char);
+      this.formulaIndex++;
+    }
+    if (this.reNumber.test(char) || char === '.') {
+      console.log(e)
+      if (this.reNumber.test(this.formulaArr[this.formulaIndex - 1]) || char === '.') {
+        this.formulaArr[this.formulaIndex - 1] += char;
+      } else {
+        this.formulaArr.splice(this.formulaIndex, 0, char);
+        this.formulaIndex++;
+      }
+    }
+
+    this.textArea.nativeElement.value = "";
+    this.chRef.detectChanges();
+  }
+
+  formulaWrapClick(){
+    console.log(23)
   }
 
   modelChange(id) {
@@ -63,36 +137,41 @@ export class DialogParametersComponent implements OnInit {
   }
 
   ok() {
-    let spcaSpit = this.formula.split(" ");
-    let valid = true;
-    spcaSpit.forEach((item) => {
-      let arr = item.split(".");
-      if (arr.length == 2) {
-        this.listModel.forEach((model, modelIndex) => {
-          let validModel;
-          if (model.id === arr[0]) {
-            validModel = true;
-            let validParam = false;
-            this.listParams.forEach((comp, index) => {
-              if (comp.id === arr[1]) {
-                validParam = true
-              }
+    this.removeSpace();
+    this.formulaArr.unshift("=");
+    console.log(this.formulaArr, this.formulaArr.join(" "));
+    this.formula = this.formulaArr.join(" ");
+    this.dialogRef.close({ formula: this.formula });
+    // let spcaSpit = this.formula.split(" ");
+    // let valid = true;
+    // spcaSpit.forEach((item) => {
+    //   let arr = item.split(".");
+    //   if (arr.length == 2) {
+    //     this.listModel.forEach((model, modelIndex) => {
+    //       let validModel;
+    //       if (model.id === arr[0]) {
+    //         validModel = true;
+    //         let validParam = false;
+    //         this.listParams.forEach((comp, index) => {
+    //           if (comp.id === arr[1]) {
+    //             validParam = true
+    //           }
 
-              if (this.listParams.length === (index + 1) && !validParam) {
-                valid = false;
-              }
-            })
-          }
-          if (this.listModel.length === (modelIndex + 1) && !validModel) {
-            valid = false;
-          }
-        })
-      }
-    })
+    //           if (this.listParams.length === (index + 1) && !validParam) {
+    //             valid = false;
+    //           }
+    //         })
+    //       }
+    //       if (this.listModel.length === (modelIndex + 1) && !validModel) {
+    //         valid = false;
+    //       }
+    //     })
+    //   }
+    // })
 
-    if (valid) {
-      this.dialogRef.close({ formula: this.formula });
-    }
+    // if (valid) {
+    //   this.dialogRef.close({ formula: this.formula });
+    // }
   }
 
   selectedFormulaVar = "";
@@ -102,7 +181,6 @@ export class DialogParametersComponent implements OnInit {
     let item = this.searchById(e, this.listParams);
     let model = this.searchById(this.sleectedModel, this.listModel);
     let object = this.searchById(this.selectedObject, this.listObjects);
-    console.log(this.sleectedModel , model.id)
     // if(this.sleectedModel === model.id) {
     //   this.selectedFormulaVar = item.id;
     // } else {
@@ -111,16 +189,12 @@ export class DialogParametersComponent implements OnInit {
   }
 
   add() {
-    setTimeout(() => {
-      if (this.boolLastOperator && this.selectedFormulaVar) {
-        if (this.reOperator.test(this.formula[this.formula.length - 1])) {
-          this.formula = this.formula + ' ' + this.selectedFormulaVar;
-        } else {
-          this.formula += this.selectedFormulaVar;
-        }
-        this.boolLastOperator = false;
-      }
-    }, 2);
+        // if (this.reOperator.test(this.formula[this.formula.length - 1])) {
+        //   this.formula = this.formula + ' ' + this.selectedFormulaVar;
+        // } else {
+        //   this.formula += this.selectedFormulaVar;
+        // }
+        this.formulaArr.splice(this.formulaIndex, 0, this.selectedFormulaVar);
   }
 
   searchById(id, arr) {
@@ -131,8 +205,9 @@ export class DialogParametersComponent implements OnInit {
   }
 
   re = /^\s{0,1}\d+[.]?(\d+)?(\s{0,1}[+|(\-)|*|/]+\s{0,1}\d+[.]?(\d+)?)*\s{0,1}$/;
-  reOperator = /^[+\-*/]$/mg;
-  reNumber = /[0-9]/;
+  reOperator = /^[+\-*()/]/;
+  reNumber = /^\d/;
+  // reNumber = /(?<=^| )\d+(\.\d+)?(?=$| )/;
   reDigit = /^[0-9]*.([0-9]+)?$/mg;
   keyPeriod = true;
   boolLastOperator;
