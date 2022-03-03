@@ -20,7 +20,9 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
     "Output",
     "InputOutput",
     "Process",
-    "Board"
+    "Board",
+    "Min",
+    "Max"
   ];
 
   colors = {
@@ -28,7 +30,9 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
     "Output": "#fbe5d6",
     "InputOutput": "#e2f0d9",
     "Process": "#b4c7e7",
-    "Board": "#ffe699"
+    "Board": "#ffe699",
+    "Min": "#FF3333",
+    "Max": "#FFCC00"
   }
 
   picture;
@@ -511,10 +515,16 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
         model.modelId = this.modelId;
         model.userId = this.user._id;
         model.id = this.dragType + (this.data.filter(value => value.objectClass === this.dragType).length + 1);
-        let p1 = new ParameterClass("Cost", "Cost", "0", 1);
-        let p2 = new ParameterClass("Rate", "Rate", "0", 1);
-        let p3 = new ParameterClass("Price", "Price", "0", 1);
-        model.parameters = [p1, p2, p3];
+        if(this.dragType !== 'Max' && this.dragType !== 'Min') {
+          let p1 = new ParameterClass("Cost", "Cost", "0", 1);
+          let p2 = new ParameterClass("Rate", "Rate", "0", 1);
+          let p3 = new ParameterClass("Price", "Price", "0", 1);
+          model.parameters = [p1, p2, p3];
+        } else {
+          let p1 = new ParameterClass("Priority", "Priority", "0", 1);
+          model.parameters = [p1];
+        }
+
         this.componentService.create(model).subscribe((data) => {
           this.saverComponent.push(JSON.parse(JSON.stringify( this.data )));
           this.data.push(data);
@@ -539,6 +549,8 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
         case "InputOutput":
         case "Process":
         case "Board":
+        case "Min":
+        case "Max":
           let d, dx, dy, color;
           dx = element.x - 10;
           dy = element.y - 8;
@@ -735,13 +747,13 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
                       <div style="display:flex;align-items: center;">
                       <input id="${index}-${paramIndex}-left" class="range-button" type="button" value="<">
                       </input>
-                      <input id="${index}-${paramIndex}" type="range" 
-                      min="${+param.sliderMin - 1}" max="${+param.sliderMax + 1}" 
+                      <input id="${index}-${paramIndex}" type="range"
+                      min="${+param.sliderMin - 1}" max="${+param.sliderMax + 1}"
                       step="${param.sliderStep}" value="${param.value}" />
                       <input id="${index}-${paramIndex}-right" class="range-button" type="button" value=">">
                       </input>
                       </div>
-                
+
                       `
                     });
                   gR.append("text")
@@ -765,7 +777,7 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
 
                   let rangeElementleft: any = document.getElementById(`${index}-${paramIndex}-left`);
                   rangeElementleft.onclick = function (e) {
-                    
+
                     setTimeout(() => {
                     let value = +rangeElement.value - +param.sliderStep;
                       if (value >= param.sliderMin) {
