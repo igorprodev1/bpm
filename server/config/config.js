@@ -41,12 +41,12 @@ const config = {
   // "lint": "ng lint",
   // "e2e": "ng e2e"
   //git push heroku master
-  
-//   NODE_ENV=production      
-//   SERVER_PORT=4040                                                                                                 
-//  JWT_SECRET=0a6b944d-d2fb-46fc-a85e-0295c986cd9g               
-//   MONGO_HOST=mongodb://localhost:27017/cogintech                                                                          
-//   MEAN_FRONTEND=angular 
+
+//   NODE_ENV=production
+//   SERVER_PORT=4040
+//  JWT_SECRET=0a6b944d-d2fb-46fc-a85e-0295c986cd9g
+//   MONGO_HOST=mongodb://localhost:27017/cogintech
+//   MEAN_FRONTEND=angular
 
 // NODE_ENV=development
 // SERVER_PORT=4040
@@ -54,7 +54,7 @@ const config = {
 // MONGO_HOST=mongodb://morovar:aywcz1q8@ds031948.mlab.com:31948/heroku_37kv0jj3
 // MEAN_FRONTEND=angular
 
-  port: 8080,
+  port: 9999,
   mongooseDebug: envVars.MONGOOSE_DEBUG,
   jwtSecret: envVars.JWT_SECRET,
   frontend: envVars.MEAN_FRONTEND || 'angular',
