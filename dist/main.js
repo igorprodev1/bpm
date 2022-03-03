@@ -1180,11 +1180,9 @@ var AuthHeaderInterceptor = /** @class */ (function () {
     }
     AuthHeaderInterceptor.prototype.intercept = function (req, next) {
         // Clone the request to add the new header
-        console.log(req);
         var token = new _auth_token_storage__WEBPACK_IMPORTED_MODULE_0__["TokenStorage"]();
         var tokenVal = token.getToken();
         var clonedRequest = req.clone({
-            url: "http://localhost:8080" + req.url,
             headers: req
                 .headers
                 .set('Authorization', tokenVal ? "Bearer " + tokenVal : '')
