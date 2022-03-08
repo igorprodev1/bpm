@@ -14,7 +14,9 @@ const Model = require('../models/model.model');
 module.exports = {
   insert,
   getAll,
-  getAllById
+  getAllById,
+  remove,
+  updateById
 }
 
 async function insert(model) {
@@ -30,5 +32,12 @@ async function getAllById(params) {
   return await Model.find({userId: params.id})
 }
 
+async function remove(params) {
+  return await Model.remove({_id: params.id})
+}
+
+async function updateById(params) {
+  return await Model.update({_id: params._id}, {$set: params})
+}
 
 
