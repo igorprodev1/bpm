@@ -40,5 +40,5 @@ export class ModelService {
     return this.http.get('/api/user/getallusers');
   }
 
-
+  
 }

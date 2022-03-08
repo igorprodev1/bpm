@@ -51,6 +51,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _angular_router__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/router */ "./node_modules/@angular/router/fesm5/router.js");
 /* harmony import */ var _admin_component__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./admin.component */ "./src/app/admin/admin.component.ts");
 /* harmony import */ var _admin_user_guard__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./admin-user-guard */ "./src/app/admin/admin-user-guard.ts");
+/* harmony import */ var _users_info_users_info_component__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./users-info/users-info.component */ "./src/app/admin/users-info/users-info.component.ts");
 var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -61,12 +62,17 @@ var __decorate = (undefined && undefined.__decorate) || function (decorators, ta
 
 
 
+
 var routes = [{
         path: 'admin',
         canActivate: [_admin_user_guard__WEBPACK_IMPORTED_MODULE_3__["OnlyAdminUsersGuard"]],
         children: [{
                 path: '',
                 component: _admin_component__WEBPACK_IMPORTED_MODULE_2__["AdminComponent"],
+            },
+            {
+                path: 'users',
+                component: _users_info_users_info_component__WEBPACK_IMPORTED_MODULE_4__["UsersInfoComponent"],
             }]
     }];
 var AdminRoutingModule = /** @class */ (function () {
@@ -96,6 +102,7 @@ var AdminRoutingModule = /** @class */ (function () {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "OnlyAdminUsersGuard", function() { return OnlyAdminUsersGuard; });
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
+/* harmony import */ var _auth_token_storage__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../auth/token.storage */ "./src/app/auth/token.storage.ts");
 var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -106,16 +113,19 @@ var __metadata = (undefined && undefined.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 
+
 var OnlyAdminUsersGuard = /** @class */ (function () {
-    function OnlyAdminUsersGuard() {
+    function OnlyAdminUsersGuard(tokenStorage) {
+        this.tokenStorage = tokenStorage;
     }
     OnlyAdminUsersGuard.prototype.canActivate = function () {
-        var user = window.user;
+        var user = this.tokenStorage.getUser();
+        console.log(user);
         return user && user.isAdmin;
     };
     OnlyAdminUsersGuard = __decorate([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Injectable"])(),
-        __metadata("design:paramtypes", [])
+        __metadata("design:paramtypes", [_auth_token_storage__WEBPACK_IMPORTED_MODULE_1__["TokenStorage"]])
     ], OnlyAdminUsersGuard);
     return OnlyAdminUsersGuard;
 }());
@@ -190,6 +200,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _admin_routing_module__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./admin-routing.module */ "./src/app/admin/admin-routing.module.ts");
 /* harmony import */ var _admin_component__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./admin.component */ "./src/app/admin/admin.component.ts");
 /* harmony import */ var _admin_user_guard__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./admin-user-guard */ "./src/app/admin/admin-user-guard.ts");
+/* harmony import */ var _users_info_users_info_component__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./users-info/users-info.component */ "./src/app/admin/users-info/users-info.component.ts");
+/* harmony import */ var _angular_material__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @angular/material */ "./node_modules/@angular/material/esm5/material.es5.js");
+/* harmony import */ var _angular_forms__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @angular/forms */ "./node_modules/@angular/forms/fesm5/forms.js");
 var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -201,17 +214,23 @@ var __decorate = (undefined && undefined.__decorate) || function (decorators, ta
 
 
 
+
+
+
 var AdminModule = /** @class */ (function () {
     function AdminModule() {
     }
     AdminModule = __decorate([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["NgModule"])({
             declarations: [
-                _admin_component__WEBPACK_IMPORTED_MODULE_3__["AdminComponent"]
+                _admin_component__WEBPACK_IMPORTED_MODULE_3__["AdminComponent"],
+                _users_info_users_info_component__WEBPACK_IMPORTED_MODULE_5__["UsersInfoComponent"]
             ],
             imports: [
                 _angular_common__WEBPACK_IMPORTED_MODULE_1__["CommonModule"],
                 _admin_routing_module__WEBPACK_IMPORTED_MODULE_2__["AdminRoutingModule"],
+                _angular_forms__WEBPACK_IMPORTED_MODULE_7__["FormsModule"],
+                _angular_material__WEBPACK_IMPORTED_MODULE_6__["MatCheckboxModule"]
             ],
             providers: [
                 _admin_user_guard__WEBPACK_IMPORTED_MODULE_4__["OnlyAdminUsersGuard"]
@@ -219,6 +238,110 @@ var AdminModule = /** @class */ (function () {
         })
     ], AdminModule);
     return AdminModule;
+}());
+
+
+
+/***/ }),
+
+/***/ "./src/app/admin/users-info/users-info.component.html":
+/*!************************************************************!*\
+  !*** ./src/app/admin/users-info/users-info.component.html ***!
+  \************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = "<table id=\"customers\">\n  <tr>\n    <th>Users</th>\n    <th>Models</th>\n    <th>Objects</th>\n    <th>Admin</th>\n  </tr>\n  <tr *ngFor=\"let user of users\">\n    <td>{{user.email}}</td>\n    <td>{{getModels(user._id).length}}</td>\n    <td>{{getComponents(user._id).length}}</td>\n    <td>\n        <mat-checkbox [(ngModel)]=\"user.isAdmin\" (ngModelChange)=\"setAdmin(user)\">Admin</mat-checkbox>\n    </td>\n  </tr>\n</table>\n"
+
+/***/ }),
+
+/***/ "./src/app/admin/users-info/users-info.component.scss":
+/*!************************************************************!*\
+  !*** ./src/app/admin/users-info/users-info.component.scss ***!
+  \************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = "#customers {\n  font-family: \"Trebuchet MS\", Arial, Helvetica, sans-serif;\n  border-collapse: collapse;\n  width: 100%;\n  margin-left: 40px; }\n\n#customers td, #customers th {\n  border: 1px solid #ddd;\n  padding: 8px; }\n\n#customers tr:nth-child(even) {\n  background-color: #f2f2f2; }\n\n#customers tr:hover {\n  background-color: #ddd; }\n\n#customers th {\n  padding-top: 12px;\n  padding-bottom: 12px;\n  text-align: left;\n  background-color: #4CAF50;\n  color: white; }\n"
+
+/***/ }),
+
+/***/ "./src/app/admin/users-info/users-info.component.ts":
+/*!**********************************************************!*\
+  !*** ./src/app/admin/users-info/users-info.component.ts ***!
+  \**********************************************************/
+/*! exports provided: UsersInfoComponent */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "UsersInfoComponent", function() { return UsersInfoComponent; });
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
+/* harmony import */ var _shared_model_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../shared/model.service */ "./src/app/shared/model.service.ts");
+/* harmony import */ var _shared_component_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../shared/component.service */ "./src/app/shared/component.service.ts");
+var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (undefined && undefined.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+
+var UsersInfoComponent = /** @class */ (function () {
+    function UsersInfoComponent(modelService, componentService) {
+        var _this = this;
+        this.modelService = modelService;
+        this.componentService = componentService;
+        this.users = [];
+        this.models = [];
+        this.components = [];
+        this.modelService.getAllUsers().subscribe(function (data) {
+            _this.users = data;
+            console.log(data);
+        });
+        this.modelService.getAll().subscribe(function (data) {
+            _this.models = data;
+            console.log(data);
+        });
+        this.componentService.getAll().subscribe(function (data) {
+            _this.components = data;
+            console.log(data);
+        });
+    }
+    UsersInfoComponent.prototype.ngOnInit = function () {
+    };
+    UsersInfoComponent.prototype.setAdmin = function (user) {
+        var _this = this;
+        this.modelService.updateUserById(user).subscribe(function () {
+            _this.modelService.getAllUsers().subscribe(function (data) {
+                _this.users = data;
+                console.log(data);
+            });
+        });
+    };
+    UsersInfoComponent.prototype.getModels = function (id) {
+        return this.models.filter(function (model) {
+            return model.userId === id;
+        });
+    };
+    UsersInfoComponent.prototype.getComponents = function (id) {
+        return this.components.filter(function (component) {
+            return component.userId === id;
+        });
+    };
+    UsersInfoComponent = __decorate([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"])({
+            selector: 'app-users-info',
+            template: __webpack_require__(/*! ./users-info.component.html */ "./src/app/admin/users-info/users-info.component.html"),
+            styles: [__webpack_require__(/*! ./users-info.component.scss */ "./src/app/admin/users-info/users-info.component.scss")]
+        }),
+        __metadata("design:paramtypes", [_shared_model_service__WEBPACK_IMPORTED_MODULE_1__["ModelService"], _shared_component_service__WEBPACK_IMPORTED_MODULE_2__["ComponentService"]])
+    ], UsersInfoComponent);
+    return UsersInfoComponent;
 }());
 
 
@@ -295,7 +418,7 @@ var AppRoutingModule = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<app-header [user]=\"user\"></app-header>\r\n<div class=\"wrapper-app\">\r\n  <router-outlet></router-outlet>\r\n</div>\r\n<footer>\r\n</footer>\r\n"
+module.exports = "<app-header [user]=\"user\"></app-header>\n<div class=\"wrapper-app\">\n  <router-outlet></router-outlet>\n</div>\n<footer>\n</footer>\n"
 
 /***/ }),
 
@@ -325,6 +448,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _angular_material__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @angular/material */ "./node_modules/@angular/material/esm5/material.es5.js");
 /* harmony import */ var _angular_platform_browser__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @angular/platform-browser */ "./node_modules/@angular/platform-browser/fesm5/platform-browser.js");
 /* harmony import */ var _auth_auth_service__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./auth/auth.service */ "./src/app/auth/auth.service.ts");
+/* harmony import */ var _auth_token_storage__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./auth/token.storage */ "./src/app/auth/token.storage.ts");
+/* harmony import */ var _shared_model_service__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./shared/model.service */ "./src/app/shared/model.service.ts");
 var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -339,12 +464,16 @@ var __metadata = (undefined && undefined.__metadata) || function (k, v) {
 
 
 
+
+
 var AppComponent = /** @class */ (function () {
-    function AppComponent(authService, router, domSanitizer, matIconRegistry) {
+    function AppComponent(authService, router, domSanitizer, matIconRegistry, tokenStorage, modelService) {
         this.authService = authService;
         this.router = router;
         this.domSanitizer = domSanitizer;
         this.matIconRegistry = matIconRegistry;
+        this.tokenStorage = tokenStorage;
+        this.modelService = modelService;
         this.registerSvgIcons();
     }
     AppComponent.prototype.ngOnInit = function () {
@@ -352,6 +481,11 @@ var AppComponent = /** @class */ (function () {
         // init this.user on startup
         this.authService.me().subscribe(function (data) {
             _this.user = data.user;
+            window.user = data.user;
+            // this.user.isAdmin = true;
+            // this.modelService.updateUserById(this.user).subscribe(() => {
+            // })
+            _this.tokenStorage.saveUser(JSON.stringify(data.user));
         });
         // update this.user after login/register/logout
         this.userSubscription = this.authService.$userSource.subscribe(function (user) {
@@ -418,7 +552,9 @@ var AppComponent = /** @class */ (function () {
         __metadata("design:paramtypes", [_auth_auth_service__WEBPACK_IMPORTED_MODULE_4__["AuthService"],
             _angular_router__WEBPACK_IMPORTED_MODULE_1__["Router"],
             _angular_platform_browser__WEBPACK_IMPORTED_MODULE_3__["DomSanitizer"],
-            _angular_material__WEBPACK_IMPORTED_MODULE_2__["MatIconRegistry"]])
+            _angular_material__WEBPACK_IMPORTED_MODULE_2__["MatIconRegistry"],
+            _auth_token_storage__WEBPACK_IMPORTED_MODULE_5__["TokenStorage"],
+            _shared_model_service__WEBPACK_IMPORTED_MODULE_6__["ModelService"]])
     ], AppComponent);
     return AppComponent;
 }());
@@ -804,7 +940,7 @@ var AuthService = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<h1 class=\"title\">Welcome back!</h1>\r\n<p class=\"subtitle\">Log in below and make work flow.</p>\r\n<p class=\"subtitle\" *ngIf=\"showError\" style=\"color: red\">Incorrect login or password</p>\r\n\r\n<div class=\"auth-container\">\r\n  <form action=\"\">\r\n    <div class=\"form-group\">\r\n      <input\r\n        type=\"text\"\r\n        name=\"email\"\r\n        class=\"input\"\r\n        placeholder=\"Your email\"\r\n        [(ngModel)]=\"email\"\r\n      />\r\n    </div>\r\n    <div class=\"form-group\">\r\n      <input\r\n        type=\"password\"\r\n        class=\"input\"\r\n        [(ngModel)]=\"password\"\r\n        name=\"password\"\r\n        placeholder=\"Your password\"\r\n      />\r\n    </div>\r\n    <div class=\"form-submit\">\r\n      <button (click)=\"login()\" mat-raised-button color=\"primary\">\r\n        Login\r\n      </button>\r\n    </div>\r\n  </form>\r\n  <div class=\"form-footer df jc-b\">\r\n    <span>\r\n        No account yet?\r\n      <a class=\"button-link\" [routerLink]=\"['/auth/register']\">Sign up</a>\r\n    </span>\r\n    <span>\r\n      <a class=\"button-link\">Forgot your password?</a>\r\n    </span>\r\n  </div>\r\n  <!-- <form action=\"\" class=\"social-form\">\r\n    <button mat-stroked-button>\r\n      <img src=\"assets/icons/btn_google.svg\" alt=\"\" />\r\n      Login with Google\r\n    </button>\r\n    <button mat-stroked-button>\r\n      <img src=\"assets/icons/btn_linkedin.svg\" alt=\"\" />\r\n      Login with LinkedIn\r\n    </button>\r\n  </form> -->\r\n</div>\r\n\r\n<!-- <mat-card class=\"example-card\">\r\n  <mat-card-content>\r\n    <form class=\"example-form\">\r\n      <table cellspacing=\"0\">\r\n        <tr>\r\n          <td>\r\n            <mat-form-field>\r\n              <input\r\n                matInput\r\n                placeholder=\"Email\"\r\n                [(ngModel)]=\"email\"\r\n                name=\"email\"\r\n                required\r\n              />\r\n            </mat-form-field>\r\n          </td>\r\n        </tr>\r\n        <tr>\r\n          <td>\r\n            <mat-form-field>\r\n              <input\r\n                matInput\r\n                placeholder=\"Password\"\r\n                [(ngModel)]=\"password\"\r\n                type=\"password\"\r\n                name=\"password\"\r\n                required\r\n              />\r\n            </mat-form-field>\r\n          </td>\r\n        </tr>\r\n      </table>\r\n    </form>\r\n  </mat-card-content>\r\n  <mat-card-actions>\r\n    <button mat-raised-button (click)=\"login()\" color=\"primary\">Login</button>\r\n    <span\r\n      >Don't have an account ?\r\n      <a [routerLink]=\"['/auth/register']\">register</a> here</span\r\n    >\r\n  </mat-card-actions>\r\n</mat-card> -->"
+module.exports = "<h1 class=\"title\">Welcome back!</h1>\n<p class=\"subtitle\">Log in below and make work flow.</p>\n<p class=\"subtitle\" *ngIf=\"showError\" style=\"color: red\">Incorrect login or password</p>\n\n<div class=\"auth-container\">\n  <form action=\"\">\n    <div class=\"form-group\">\n      <input\n        type=\"text\"\n        name=\"email\"\n        class=\"input\"\n        placeholder=\"Your email\"\n        [(ngModel)]=\"email\"\n      />\n    </div>\n    <div class=\"form-group\">\n      <input\n        type=\"password\"\n        class=\"input\"\n        [(ngModel)]=\"password\"\n        name=\"password\"\n        placeholder=\"Your password\"\n      />\n    </div>\n    <div class=\"form-submit\">\n      <button (click)=\"login()\" mat-raised-button color=\"primary\">\n        Login\n      </button>\n    </div>\n  </form>\n  <div class=\"form-footer df jc-b\">\n    <span>\n        No account yet?\n      <a class=\"button-link\" [routerLink]=\"['/auth/register']\">Sign up</a>\n    </span>\n    <span>\n      <a class=\"button-link\">Forgot your password?</a>\n    </span>\n  </div>\n  <!-- <form action=\"\" class=\"social-form\">\n    <button mat-stroked-button>\n      <img src=\"assets/icons/btn_google.svg\" alt=\"\" />\n      Login with Google\n    </button>\n    <button mat-stroked-button>\n      <img src=\"assets/icons/btn_linkedin.svg\" alt=\"\" />\n      Login with LinkedIn\n    </button>\n  </form> -->\n</div>\n\n<!-- <mat-card class=\"example-card\">\n  <mat-card-content>\n    <form class=\"example-form\">\n      <table cellspacing=\"0\">\n        <tr>\n          <td>\n            <mat-form-field>\n              <input\n                matInput\n                placeholder=\"Email\"\n                [(ngModel)]=\"email\"\n                name=\"email\"\n                required\n              />\n            </mat-form-field>\n          </td>\n        </tr>\n        <tr>\n          <td>\n            <mat-form-field>\n              <input\n                matInput\n                placeholder=\"Password\"\n                [(ngModel)]=\"password\"\n                type=\"password\"\n                name=\"password\"\n                required\n              />\n            </mat-form-field>\n          </td>\n        </tr>\n      </table>\n    </form>\n  </mat-card-content>\n  <mat-card-actions>\n    <button mat-raised-button (click)=\"login()\" color=\"primary\">Login</button>\n    <span\n      >Don't have an account ?\n      <a [routerLink]=\"['/auth/register']\">register</a> here</span\n    >\n  </mat-card-actions>\n</mat-card> -->"
 
 /***/ }),
 
@@ -873,7 +1009,7 @@ var LoginComponent = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<h1 class=\"title\">Create a Cogintech Account</h1>\r\n<p class=\"subtitle\">Sign up below and make work flow.</p>\r\n<div class=\"auth-container\">\r\n  <form action=\"\" [formGroup]=\"userForm\">\r\n    <div class=\"form-group\">\r\n      <input\r\n        type=\"text\"\r\n        class=\"input\"\r\n        placeholder=\"Your name\"\r\n        formControlName=\"fullname\"\r\n        name=\"fullname\"\r\n      />\r\n    </div>\r\n    <div class=\"form-group\">\r\n      <input\r\n        type=\"email\"\r\n        class=\"input\"\r\n        formControlName=\"email\"\r\n        name=\"email\"\r\n        placeholder=\"Your email address\"\r\n      />\r\n      <div class=\"error\" *ngIf=\"userForm.controls['email'].invalid && userForm.controls['email'].touched\">\r\n          Password mismatch\r\n        </div>\r\n    </div>\r\n    <div class=\"form-group\">\r\n      <input\r\n        class=\"input\"\r\n        formControlName=\"password\"\r\n        type=\"password\"\r\n        name=\"password\"\r\n        placeholder=\"Choose a password\"\r\n      />\r\n    </div>\r\n    <div class=\"form-group\">\r\n      <input\r\n        class=\"input\"\r\n        formControlName=\"repeatPassword\"\r\n        type=\"password\"\r\n        name=\"repeatPassword\"\r\n        placeholder=\"Repeat a password\"\r\n      />\r\n      <div class=\"error\" *ngIf=\"userForm.controls['repeatPassword'].invalid && userForm.controls['repeatPassword'].touched\">\r\n        Password mismatch\r\n      </div>\r\n    </div>\r\n    <div class=\"form-submit\">\r\n      <button (click)=\"register()\" mat-raised-button color=\"primary\">\r\n        Sign up free\r\n      </button>\r\n    </div>\r\n    <div class=\"form-footer\">\r\n      <span>\r\n        By signing up you agree to our\r\n        <a target=\"_blank\" class=\"button-link\">Terms of Use</a> and\r\n        <a target=\"_blank\" class=\"button-link\">Privacy Policy</a>.\r\n      </span>\r\n    </div>\r\n  </form>\r\n  <!-- <form action=\"\" class=\"social-form\">\r\n    <button mat-stroked-button>\r\n      <img src=\"assets/icons/btn_google.svg\" alt=\"\" />\r\n      Sign up with Google\r\n    </button>\r\n    <button mat-stroked-button>\r\n      <img src=\"assets/icons/btn_linkedin.svg\" alt=\"\" />\r\n      Sign up with LinkedIn\r\n    </button>\r\n  </form> -->\r\n  <div class=\"form-footer\">\r\n    <span>\r\n      Already got an account?\r\n      <a class=\"button-link\" [routerLink]=\"['/auth/login']\">Login</a>\r\n    </span>\r\n  </div>\r\n</div>\r\n\r\n<!-- <mat-card class=\"example-card\">\r\n  <mat-card-header>\r\n    <mat-card-title>Register</mat-card-title>\r\n  </mat-card-header>\r\n  <mat-card-content>\r\n    <form class=\"example-form\">\r\n      <table cellspacing=\"0\" [formGroup]=\"userForm\">\r\n        <tr>\r\n          <td>\r\n            <mat-form-field>\r\n              <input\r\n                matInput\r\n                placeholder=\"Fullname\"\r\n                formControlName=\"fullname\"\r\n                name=\"fullname\"\r\n                required\r\n              />\r\n            </mat-form-field>\r\n          </td>\r\n        </tr>\r\n        <tr>\r\n          <td>\r\n            <mat-form-field>\r\n              <input\r\n                matInput\r\n                placeholder=\"Email\"\r\n                formControlName=\"email\"\r\n                name=\"email\"\r\n                required\r\n              />\r\n              <mat-error *ngIf=\"email.invalid && email.errors.email\"\r\n                >Invalid email address</mat-error\r\n              >\r\n            </mat-form-field>\r\n          </td>\r\n        </tr>\r\n        <tr>\r\n          <td>\r\n            <mat-form-field>\r\n              <input\r\n                matInput\r\n                placeholder=\"Password\"\r\n                formControlName=\"password\"\r\n                type=\"password\"\r\n                name=\"password\"\r\n                required\r\n              />\r\n            </mat-form-field>\r\n          </td>\r\n        </tr>\r\n        <tr>\r\n          <td>\r\n            <mat-form-field>\r\n              <input\r\n                matInput\r\n                placeholder=\"Reapet Password\"\r\n                formControlName=\"repeatPassword\"\r\n                type=\"password\"\r\n                name=\"repeatPassword\"\r\n                required\r\n              />\r\n              <mat-error\r\n                *ngIf=\"\r\n                  repeatPassword.invalid && repeatPassword.errors.passwordMatch\r\n                \"\r\n                >Password mismatch</mat-error\r\n              >\r\n            </mat-form-field>\r\n          </td>\r\n        </tr>\r\n      </table>\r\n    </form>\r\n  </mat-card-content>\r\n  <mat-card-actions>\r\n    <button mat-raised-button (click)=\"register()\" color=\"primary\">\r\n      Register\r\n    </button>\r\n    <span\r\n      >Allrady have an account ?\r\n      <a [routerLink]=\"['/auth/login']\">login</a> here</span\r\n    >\r\n  </mat-card-actions>\r\n</mat-card> -->"
+module.exports = "<h1 class=\"title\">Create a Cogintech Account</h1>\n<p class=\"subtitle\">Sign up below and make work flow.</p>\n<div class=\"auth-container\">\n  <form action=\"\" [formGroup]=\"userForm\">\n    <div class=\"form-group\">\n      <input\n        type=\"text\"\n        class=\"input\"\n        placeholder=\"Your name\"\n        formControlName=\"fullname\"\n        name=\"fullname\"\n      />\n    </div>\n    <div class=\"form-group\">\n      <input\n        type=\"email\"\n        class=\"input\"\n        formControlName=\"email\"\n        name=\"email\"\n        placeholder=\"Your email address\"\n      />\n      <div class=\"error\" *ngIf=\"userForm.controls['email'].invalid && userForm.controls['email'].touched\">\n          Password mismatch\n        </div>\n    </div>\n    <div class=\"form-group\">\n      <input\n        class=\"input\"\n        formControlName=\"password\"\n        type=\"password\"\n        name=\"password\"\n        placeholder=\"Choose a password\"\n      />\n    </div>\n    <div class=\"form-group\">\n      <input\n        class=\"input\"\n        formControlName=\"repeatPassword\"\n        type=\"password\"\n        name=\"repeatPassword\"\n        placeholder=\"Repeat a password\"\n      />\n      <div class=\"error\" *ngIf=\"userForm.controls['repeatPassword'].invalid && userForm.controls['repeatPassword'].touched\">\n        Password mismatch\n      </div>\n    </div>\n    <div class=\"form-submit\">\n      <button (click)=\"register()\" mat-raised-button color=\"primary\">\n        Sign up free\n      </button>\n    </div>\n    <div class=\"form-footer\">\n      <span>\n        By signing up you agree to our\n        <a target=\"_blank\" class=\"button-link\">Terms of Use</a> and\n        <a target=\"_blank\" class=\"button-link\">Privacy Policy</a>.\n      </span>\n    </div>\n  </form>\n  <!-- <form action=\"\" class=\"social-form\">\n    <button mat-stroked-button>\n      <img src=\"assets/icons/btn_google.svg\" alt=\"\" />\n      Sign up with Google\n    </button>\n    <button mat-stroked-button>\n      <img src=\"assets/icons/btn_linkedin.svg\" alt=\"\" />\n      Sign up with LinkedIn\n    </button>\n  </form> -->\n  <div class=\"form-footer\">\n    <span>\n      Already got an account?\n      <a class=\"button-link\" [routerLink]=\"['/auth/login']\">Login</a>\n    </span>\n  </div>\n</div>\n\n<!-- <mat-card class=\"example-card\">\n  <mat-card-header>\n    <mat-card-title>Register</mat-card-title>\n  </mat-card-header>\n  <mat-card-content>\n    <form class=\"example-form\">\n      <table cellspacing=\"0\" [formGroup]=\"userForm\">\n        <tr>\n          <td>\n            <mat-form-field>\n              <input\n                matInput\n                placeholder=\"Fullname\"\n                formControlName=\"fullname\"\n                name=\"fullname\"\n                required\n              />\n            </mat-form-field>\n          </td>\n        </tr>\n        <tr>\n          <td>\n            <mat-form-field>\n              <input\n                matInput\n                placeholder=\"Email\"\n                formControlName=\"email\"\n                name=\"email\"\n                required\n              />\n              <mat-error *ngIf=\"email.invalid && email.errors.email\"\n                >Invalid email address</mat-error\n              >\n            </mat-form-field>\n          </td>\n        </tr>\n        <tr>\n          <td>\n            <mat-form-field>\n              <input\n                matInput\n                placeholder=\"Password\"\n                formControlName=\"password\"\n                type=\"password\"\n                name=\"password\"\n                required\n              />\n            </mat-form-field>\n          </td>\n        </tr>\n        <tr>\n          <td>\n            <mat-form-field>\n              <input\n                matInput\n                placeholder=\"Reapet Password\"\n                formControlName=\"repeatPassword\"\n                type=\"password\"\n                name=\"repeatPassword\"\n                required\n              />\n              <mat-error\n                *ngIf=\"\n                  repeatPassword.invalid && repeatPassword.errors.passwordMatch\n                \"\n                >Password mismatch</mat-error\n              >\n            </mat-form-field>\n          </td>\n        </tr>\n      </table>\n    </form>\n  </mat-card-content>\n  <mat-card-actions>\n    <button mat-raised-button (click)=\"register()\" color=\"primary\">\n      Register\n    </button>\n    <span\n      >Allrady have an account ?\n      <a [routerLink]=\"['/auth/login']\">login</a> here</span\n    >\n  </mat-card-actions>\n</mat-card> -->"
 
 /***/ }),
 
@@ -993,11 +1129,13 @@ var __metadata = (undefined && undefined.__metadata) || function (k, v) {
 };
 
 var TOKEN_KEY = 'AuthToken';
+var USER = 'user';
 var TokenStorage = /** @class */ (function () {
     function TokenStorage() {
     }
     TokenStorage.prototype.signOut = function () {
         window.localStorage.removeItem(TOKEN_KEY);
+        window.localStorage.removeItem(USER);
         window.localStorage.clear();
     };
     TokenStorage.prototype.saveToken = function (token) {
@@ -1008,6 +1146,15 @@ var TokenStorage = /** @class */ (function () {
     };
     TokenStorage.prototype.getToken = function () {
         return localStorage.getItem(TOKEN_KEY);
+    };
+    TokenStorage.prototype.saveUser = function (user) {
+        if (!user)
+            return;
+        window.localStorage.removeItem(USER);
+        window.localStorage.setItem(USER, user);
+    };
+    TokenStorage.prototype.getUser = function () {
+        return JSON.parse(localStorage.getItem(USER));
     };
     TokenStorage = __decorate([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Injectable"])(),
@@ -1027,7 +1174,7 @@ var TokenStorage = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<header>\r\n  <mat-toolbar color=\"primary\">\r\n    <div [ngClass]=\"{'container': router.url.slice(1, 5) === 'auth'}\" class=\"df full-width\">\r\n      <a [routerLink]=\"['/']\" class=\"logo\"></a>\r\n      <span class=\"example-spacer\"></span>\r\n      <button   *ngIf=\"!user\" [routerLink]=\"['/auth/register']\" mat-raised-button color=\"primary\" class=\"m-r-10\">\r\n        Sign up free\r\n      </button>\r\n      <button\r\n        mat-button\r\n        color=\"primary\"\r\n        [routerLink]=\"['/auth/login']\"\r\n        *ngIf=\"!user\"\r\n      >\r\n        Login\r\n      </button>\r\n      <div>\r\n        <a class=\"links side\" *ngIf=\"user\" [matMenuTriggerFor]=\"menu\">\r\n          <mat-icon>account_circle</mat-icon>{{ user.fullname }}\r\n        </a>\r\n        <mat-menu #menu=\"matMenu\">\r\n          <button\r\n            mat-menu-item\r\n            *ngIf=\"user && user.isAdmin\"\r\n            [routerLink]=\"['/admin']\"\r\n          >\r\n            admin\r\n          </button>\r\n          <button mat-menu-item (click)=\"logout()\">logout</button>\r\n        </mat-menu>\r\n      </div>\r\n    </div>\r\n  </mat-toolbar>\r\n</header>\r\n"
+module.exports = "<header>\n  <mat-toolbar color=\"primary\">\n    <div [ngClass]=\"{'container': router.url.slice(1, 5) === 'auth'}\" class=\"df full-width ai-e\">\n      <a [routerLink]=\"['/']\" class=\"logo\"></a>\n      <div *ngIf=\"selectedModel\" style=\"padding-bottom: 5px; color: #463e3e;\">Model: {{selectedModel.name}}</div>\n      <span class=\"example-spacer\">\n        <app-player ></app-player >\n      </span>\n      <button *ngIf=\"!user\" style=\"margin-bottom: 5px;\" [routerLink]=\"['/auth/register']\" mat-raised-button\n        color=\"primary\" class=\"m-r-10\">\n        Sign up free\n      </button>\n      <button style=\"margin-bottom: 5px;\" mat-button color=\"primary\" [routerLink]=\"['/auth/login']\" *ngIf=\"!user\">\n        Login\n      </button>\n      <div style=\"margin-bottom: 5px;\">\n        <a class=\"links side\" *ngIf=\"user\" [matMenuTriggerFor]=\"menu\">\n          <mat-icon>account_circle</mat-icon>{{ user.fullname }}\n        </a>\n        <mat-menu #menu=\"matMenu\">\n          <button mat-menu-item *ngIf=\"user && user.isAdmin\" [routerLink]=\"['/admin']\">\n            admin\n          </button>\n          <button mat-menu-item (click)=\"logout()\">logout</button>\n        </mat-menu>\n      </div>\n    </div>\n  </mat-toolbar>\n</header>"
 
 /***/ }),
 
@@ -1038,7 +1185,7 @@ module.exports = "<header>\r\n  <mat-toolbar color=\"primary\">\r\n    <div [ngC
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "header {\n  width: 100%; }\n  header .logo {\n    background-image: url('logo.png');\n    width: 120px;\n    height: 40px;\n    background-size: contain;\n    background-repeat: no-repeat; }\n  header .example-spacer {\n    flex: 1 1 auto; }\n  header .links {\n    color: white;\n    font-family: \"Helvetica Neue\", sans-serif;\n    font-size: 15px;\n    font-weight: initial;\n    letter-spacing: -1px;\n    line-height: 1;\n    text-align: center;\n    padding: 15px; }\n  header .links.side {\n      padding: 0 14px; }\n  header .mat-toolbar {\n    background: white;\n    height: 58px;\n    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.11);\n    z-index: 10;\n    position: relative; }\n  header .mat-icon {\n    vertical-align: middle;\n    margin: 0 5px;\n    color: #673ab7; }\n  header a {\n    cursor: pointer; }\n"
+module.exports = "header {\n  width: 100%; }\n  header .logo {\n    background-image: url('logo.png');\n    width: 120px;\n    height: 40px;\n    background-size: contain;\n    background-repeat: no-repeat; }\n  header .example-spacer {\n    flex: 1 1 auto;\n    display: flex;\n    justify-content: center; }\n  header .links {\n    color: white;\n    font-family: \"Helvetica Neue\", sans-serif;\n    font-size: 15px;\n    font-weight: initial;\n    letter-spacing: -1px;\n    line-height: 1;\n    text-align: center;\n    padding: 15px; }\n  header .links.side {\n      padding: 0 14px; }\n  header .mat-toolbar {\n    background: white;\n    height: unset;\n    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.11);\n    z-index: 10;\n    position: relative;\n    min-height: 64px; }\n  header .mat-icon {\n    vertical-align: middle;\n    margin: 0 5px;\n    color: #673ab7; }\n  header a {\n    cursor: pointer; }\n"
 
 /***/ }),
 
@@ -1055,6 +1202,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
 /* harmony import */ var _angular_router__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/router */ "./node_modules/@angular/router/fesm5/router.js");
 /* harmony import */ var _auth_auth_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../auth/auth.service */ "./src/app/auth/auth.service.ts");
+/* harmony import */ var _shared_model_service__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../shared/model.service */ "./src/app/shared/model.service.ts");
 var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -1067,10 +1215,18 @@ var __metadata = (undefined && undefined.__metadata) || function (k, v) {
 
 
 
+
 var HeaderComponent = /** @class */ (function () {
-    function HeaderComponent(authService, router) {
+    function HeaderComponent(authService, router, modelService) {
+        var _this = this;
         this.authService = authService;
         this.router = router;
+        this.modelService = modelService;
+        console.log(2);
+        this.modelService.selectedModelEvent.subscribe(function (data) {
+            console.log(2);
+            _this.selectedModel = data;
+        });
     }
     HeaderComponent.prototype.ngOnInit = function () {
     };
@@ -1091,7 +1247,7 @@ var HeaderComponent = /** @class */ (function () {
             template: __webpack_require__(/*! ./header.component.html */ "./src/app/header/header.component.html"),
             styles: [__webpack_require__(/*! ./header.component.scss */ "./src/app/header/header.component.scss")]
         }),
-        __metadata("design:paramtypes", [_auth_auth_service__WEBPACK_IMPORTED_MODULE_2__["AuthService"], _angular_router__WEBPACK_IMPORTED_MODULE_1__["Router"]])
+        __metadata("design:paramtypes", [_auth_auth_service__WEBPACK_IMPORTED_MODULE_2__["AuthService"], _angular_router__WEBPACK_IMPORTED_MODULE_1__["Router"], _shared_model_service__WEBPACK_IMPORTED_MODULE_3__["ModelService"]])
     ], HeaderComponent);
     return HeaderComponent;
 }());
@@ -1107,7 +1263,7 @@ var HeaderComponent = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<p>\r\n  home works!\r\n</p>\r\n"
+module.exports = "<p>\n  home works!\n</p>\n"
 
 /***/ }),
 
@@ -1238,7 +1394,7 @@ var CatchErrorInterceptor = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"wrap\">\r\n  <div class=\"head\">\r\n    <div class=\"df ai-c\">\r\n      <div class=\"title\">\r\n        Recently Active\r\n      </div>\r\n      <!-- <div class=\"subtitle\">\r\n        Diagrams last changed by you\r\n      </div> -->\r\n    </div>\r\n    <div>\r\n      <button\r\n        (click)=\"openDialog()\"\r\n        mat-raised-button\r\n        color=\"primary\"\r\n      >\r\n        New project\r\n      </button>\r\n    </div>\r\n  </div>\r\n\r\n  <div class=\"model-list\">\r\n    <div *ngFor=\"let item of data\" class=\"model-wrap\">\r\n      <div [routerLink]=\"['/model/'+item._id]\" class=\"model\">\r\n        <div style=\"padding-left: 10px;\">\r\n          {{item.name}}\r\n        </div>\r\n        <div class=\"img-wrap\">\r\n          <img src=\"http://www.ucodice.com/kinglinkr/front/img/circle.png\" alt=\"\" />\r\n        </div>\r\n        <div>\r\n          <!-- <div class=\"name\">\r\n            {{item.name}}\r\n          </div> -->\r\n          <div class=\"desc\">\r\n            {{item.description}}\r\n          </div>\r\n        </div>\r\n      </div>\r\n      <button mat-icon-button [matMenuTriggerFor]=\"menu\" class=\"more-btn\">\r\n        <mat-icon>more_vert</mat-icon>\r\n      </button>\r\n      <mat-menu #menu=\"matMenu\">\r\n        <button (click)=\"edit(item)\" mat-menu-item class=\"menu-item\">\r\n          <i class=\"material-icons\">\r\n            edit\r\n          </i>\r\n          Edit\r\n        </button>\r\n        <button (click)=\"clone(item)\" mat-menu-item class=\"menu-item\">\r\n          <i class=\"material-icons\">\r\n            file_copy\r\n          </i>\r\n          Copy\r\n        </button>\r\n        <button (click)=\"remove(item)\" mat-menu-item class=\"menu-item\">\r\n          <i class=\"material-icons\">\r\n            delete_outline\r\n          </i>\r\n          Delete\r\n        </button>\r\n        <button (click)=\"export(item)\" mat-menu-item class=\"menu-item\">\r\n          <i class=\"material-icons\">\r\n            import_export\r\n          </i>\r\n          Export\r\n        </button>\r\n        <button (click)=\"file.click();selected = item;\" mat-menu-item class=\"menu-item\">\r\n          <i class=\"material-icons\">\r\n            import_export\r\n          </i>\r\n          Import\r\n        </button>\r\n      </mat-menu>\r\n    </div>\r\n  </div>\r\n</div>\r\n\r\n<input #file type=\"file\" (change)=\"onChange($event)\" accept=\".upm\" style=\"display: none;\"/>\r\n"
+module.exports = "<div class=\"wrap\">\n  <div class=\"head\">\n    <div class=\"df ai-c\">\n      <div class=\"title\">\n        Recently Active\n      </div>\n      <!-- <div class=\"subtitle\">\n        Diagrams last changed by you\n      </div> -->\n    </div>\n    <div>\n      <button\n        (click)=\"openDialog()\"\n        mat-raised-button\n        color=\"primary\"\n      >\n        New project\n      </button>\n    </div>\n  </div>\n\n  <div class=\"model-list\">\n    <div *ngFor=\"let item of data\" class=\"model-wrap\">\n      <div [routerLink]=\"['/model/'+item._id]\" class=\"model\">\n        <div style=\"padding-left: 10px;\">\n          {{item.name}}\n        </div>\n        <div class=\"img-wrap\">\n          <img src=\"http://www.ucodice.com/kinglinkr/front/img/circle.png\" alt=\"\" />\n        </div>\n        <div>\n          <!-- <div class=\"name\">\n            {{item.name}}\n          </div> -->\n          <div class=\"desc\">\n            {{item.description}}\n          </div>\n        </div>\n      </div>\n      <button mat-icon-button [matMenuTriggerFor]=\"menu\" class=\"more-btn\">\n        <mat-icon>more_vert</mat-icon>\n      </button>\n      <mat-menu #menu=\"matMenu\">\n        <button (click)=\"edit(item)\" mat-menu-item class=\"menu-item\">\n          <i class=\"material-icons\">\n            edit\n          </i>\n          Edit\n        </button>\n        <button (click)=\"clone(item)\" mat-menu-item class=\"menu-item\">\n          <i class=\"material-icons\">\n            file_copy\n          </i>\n          Copy\n        </button>\n        <button (click)=\"remove(item)\" mat-menu-item class=\"menu-item\">\n          <i class=\"material-icons\">\n            delete_outline\n          </i>\n          Delete\n        </button>\n        <button (click)=\"export(item)\" mat-menu-item class=\"menu-item\">\n          <i class=\"material-icons\">\n            import_export\n          </i>\n          Export\n        </button>\n        <button (click)=\"file.click();selected = item;\" mat-menu-item class=\"menu-item\">\n          <i class=\"material-icons\">\n            import_export\n          </i>\n          Import\n        </button>\n      </mat-menu>\n    </div>\n  </div>\n</div>\n\n<input #file type=\"file\" (change)=\"onChange($event)\" accept=\".upm\" style=\"display: none;\"/>\n\n"
 
 /***/ }),
 
@@ -1504,7 +1660,7 @@ var ModelListComponent = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"bpm-wrap\">\r\n  <div class=\"palette-entries\">\r\n    <div *ngFor=\"let item of types\" class=\"bpm-item\">\r\n      <div [id]=\"item\" [draggable]=\"true\" [ngStyle]=\"{'background': colors[item]}\"\r\n       class=\"square\" [title]=\"item\" tooltipPosition=\"top\">\r\n      {{item}}\r\n      </div>\r\n    </div>\r\n  </div>\r\n  <div class=\"coco-bpm-graph\" id=\"graph\" style=\"height: calc(100vh - 60px);\"></div>\r\n  <!-- <div class=\"clickShield\" *ngIf=\"showSide\" (click)=\"showSide = false\"></div> -->\r\n  <div (click)=\"showSide = !showSide\" class=\"toggle-sidebar-btn\" [ngClass]=\"{ 'active': showSide }\">\r\n    <a mat-raised-button>\r\n      <i class=\"material-icons\">\r\n        menu_open\r\n      </i>\r\n    </a>\r\n  </div>\r\n  <div [ngClass]=\"{ show: showSide }\" *ngIf=\"selectedModal\" class=\"sidebar show\">\r\n    <mat-form-field class=\"example-full-width\">\r\n      <mat-label>Id (latin simbols and digits)</mat-label>\r\n      <input matInput [(ngModel)]=\"data[selectedModal].id\" (keydown)=\"onKeyDown($event)\"\r\n      (keyup.enter)=\"onFieldChange($event)\" (blur)=\"onFieldChange($event)\"/>\r\n    </mat-form-field>\r\n    <mat-form-field class=\"example-full-width\">\r\n      <mat-label>Name</mat-label>\r\n      <input matInput [(ngModel)]=\"data[selectedModal].name\"\r\n      (keyup.enter)=\"onFieldChange($event)\" (blur)=\"onFieldChange($event)\" />\r\n    </mat-form-field>\r\n    <mat-form-field>\r\n      <mat-label>ObjectClass</mat-label>\r\n      <mat-select [(ngModel)]=\"data[selectedModal].objectClass\"\r\n      (keyup.enter)=\"onFieldChange($event)\" (blur)=\"onFieldChange($event)\">\r\n        <mat-option value=\"Board\">\r\n          Board\r\n        </mat-option>\r\n        <mat-option value=\"Input\">\r\n          Input\r\n        </mat-option>\r\n        <mat-option value=\"Output\">\r\n          Output\r\n        </mat-option>\r\n        <mat-option value=\"InputOutput\">\r\n          InputOutput\r\n        </mat-option>\r\n        <mat-option value=\"Process\">\r\n          Process\r\n        </mat-option>\r\n        <mat-option value=\"Min\">\r\n          Min\r\n        </mat-option>\r\n        <mat-option value=\"Max\">\r\n          Max\r\n        </mat-option>\r\n      </mat-select>\r\n    </mat-form-field>\r\n    <mat-form-field class=\"example-full-width\">\r\n      <input matInput placeholder=\"ObjectType\" [(ngModel)]=\"data[selectedModal].objectType\"\r\n      (keyup.enter)=\"onFieldChange($event)\" (blur)=\"onFieldChange($event)\" />\r\n    </mat-form-field>\r\n    <mat-form-field class=\"example-full-width\">\r\n      <textarea matInput placeholder=\"Description\" [(ngModel)]=\"data[selectedModal].description\"\r\n      (keyup.enter)=\"onFieldChange($event)\" (blur)=\"onFieldChange($event)\"></textarea>\r\n    </mat-form-field>\r\n    <!-- <div class=\"input-btn-wrap\">\r\n      <mat-form-field class=\"example-full-width\">\r\n        <input readonly [(ngModel)]=\"picture\" matInput placeholder=\"Picture\" />\r\n      </mat-form-field>\r\n      <input #file [(ngModel)]=\"picture\" hidden type=\"file\" />\r\n      <button (click)=\"file.click()\" mat-raised-button color=\"primary\" class=\"btn\">\r\n        <i class=\"material-icons\">\r\n          forward\r\n        </i>\r\n      </button>\r\n    </div> -->\r\n    <table class=\"table\">\r\n      <tr>\r\n        <th style=\"text-align: left;\">Parameters</th>\r\n        <th></th>\r\n        <th>M</th>\r\n        <th>C</th>\r\n        <th>S</th>\r\n        <th></th>\r\n      </tr>\r\n\r\n      <tbody *ngFor=\"let item of data[selectedModal].parameters.slice().reverse(); let i = index\">\r\n        <tr>\r\n          <td>\r\n            {{item.name}}\r\n          </td>\r\n          <td>\r\n            <mat-form-field *ngIf=\"(item.value && item.value.charAt(0) !== '=') || !item.value\" class=\"example-full-width table-input\">\r\n              <input matInput [(ngModel)]=\"item.value\"\r\n              (keyup.enter)=\"onFieldChange($event)\" (blur)=\"onFieldChange($event)\" />\r\n            </mat-form-field>\r\n            <span *ngIf=\"item.value && item.value.charAt(0) === '=' \">\r\n              f (x)\r\n            </span>\r\n          </td>\r\n          <td>\r\n            <div class=\"df jc-c\">\r\n              <mat-checkbox [(ngModel)]=\"item.measurable\"\r\n              (keyup.enter)=\"onFieldChange($event)\" (blur)=\"onFieldChange($event)\"></mat-checkbox>\r\n            </div>\r\n          </td>\r\n          <td>\r\n            <div class=\"df jc-c\">\r\n              <mat-checkbox [(ngModel)]=\"item.changeable\"\r\n              (keyup.enter)=\"onFieldChange($event)\" (blur)=\"onFieldChange($event)\"></mat-checkbox>\r\n            </div>\r\n          </td>\r\n          <td>\r\n            <div class=\"df jc-c\">\r\n              <mat-checkbox [(ngModel)]=\"item.showOnDiagram\"\r\n              (keyup.enter)=\"onFieldChange($event)\" (blur)=\"onFieldChange($event)\"></mat-checkbox>\r\n            </div>\r\n          </td>\r\n          <td>\r\n            <div class=\"df jc-c ai-c\">\r\n              <button class=\"table-more-btn\" mat-icon-button\r\n                (click)=\"optionsModal[item._id + i] = !optionsModal[item._id + i]\">\r\n                <i class=\"material-icons-outlined\">\r\n                  arrow_drop_down_circle\r\n                </i>\r\n              </button>\r\n            </div>\r\n          </td>\r\n        </tr>\r\n        <tr *ngIf=\"optionsModal[item._id + i]\">\r\n          <td colspan=\"6\">\r\n            <mat-accordion>\r\n              <mat-expansion-panel [expanded]=\"true\">\r\n                <mat-expansion-panel-header>\r\n                  <mat-panel-title>\r\n                    Personal data\r\n                  </mat-panel-title>\r\n                </mat-expansion-panel-header>\r\n\r\n                <div class=\"loop-item desc\">\r\n                  <mat-form-field class=\"example-full-width\">\r\n                    <input matInput placeholder=\"Id (latin simbols and digits)\" (keydown)=\"onKeyDown($event)\" [(ngModel)]=\"item.id\"\r\n                    (keyup.enter)=\"onFieldChange($event)\" (blur)=\"onFieldChange($event)\" />\r\n                  </mat-form-field>\r\n                  <mat-form-field class=\"example-full-width\">\r\n                    <input matInput placeholder=\"Name\" [(ngModel)]=\"item.name\"\r\n                    (keyup.enter)=\"onFieldChange($event)\" (blur)=\"onFieldChange($event)\" />\r\n                  </mat-form-field>\r\n                  <mat-form-field class=\"example-full-width\">\r\n                    <textarea matInput placeholder=\"Description\" [(ngModel)]=\"item.description\"\r\n                    (keyup.enter)=\"onFieldChange($event)\" (blur)=\"onFieldChange($event)\"></textarea>\r\n                  </mat-form-field>\r\n                  <div class=\"input-btn-wrap\">\r\n                    <mat-form-field *ngIf=\"item.value && item.value.charAt(0) !== '=' \" class=\"example-full-width\">\r\n                      <input matInput placeholder=\"Value\" [(ngModel)]=\"item.value\"\r\n                      (keyup.enter)=\"onFieldChange($event)\" (blur)=\"onFieldChange($event)\"/>\r\n                    </mat-form-field>\r\n                    <span *ngIf=\"item.value && item.value.charAt(0) === '=' \" class=\"example-full-width\">Value = f (x)</span>\r\n\r\n                    <button (click)=\"openDialog(item)\" mat-raised-button color=\"primary\" class=\"btn\">\r\n                      <i>\r\n                        f(x)\r\n                      </i>\r\n                    </button>\r\n                  </div>\r\n                  <mat-form-field>\r\n                    <mat-label>Feature label</mat-label>\r\n                    <mat-select>\r\n                      <mat-option value=\"1\">\r\n                        1\r\n                      </mat-option>\r\n                      <mat-option value=\"2\">\r\n                        2\r\n                      </mat-option>\r\n                      <mat-option value=\"3\">\r\n                        3\r\n                      </mat-option>\r\n                    </mat-select>\r\n                  </mat-form-field>\r\n                  <div class=\"chekboxs-list\">\r\n                    <mat-checkbox [(ngModel)]=\"item.measurable\"\r\n                    (keyup.enter)=\"onFieldChange($event)\" (blur)=\"onFieldChange($event)\">Measurable\r\n                    </mat-checkbox>\r\n                    <mat-checkbox [(ngModel)]=\"item.changeable\"\r\n                    (keyup.enter)=\"onFieldChange($event)\" (blur)=\"onFieldChange($event)\">Changeable\r\n                    </mat-checkbox>\r\n                    <mat-checkbox [(ngModel)]=\"item.showOnDiagram\"\r\n                    (keyup.enter)=\"onFieldChange($event)\" (blur)=\"onFieldChange($event)\">Show on\r\n                      diagram</mat-checkbox>\r\n                    <mat-checkbox [(ngModel)]=\"item.showName\"\r\n                    (keyup.enter)=\"onFieldChange($event)\" (blur)=\"onFieldChange($event)\">Show name\r\n                    </mat-checkbox>\r\n                  </div>\r\n                  <mat-form-field *ngIf=\"item.showOnDiagram\">\r\n                    <mat-label>Control type</mat-label>\r\n                    <mat-select [(ngModel)]=\"item.controlType\"\r\n                    (keyup.enter)=\"onFieldChange($event)\" (blur)=\"onFieldChange($event)\">\r\n                      <mat-option value=\"Value\">\r\n                        Value\r\n                      </mat-option>\r\n                      <mat-option value=\"Input\">\r\n                        Input\r\n                      </mat-option>\r\n                      <mat-option value=\"Slider\">\r\n                        Slider\r\n                      </mat-option>\r\n                    </mat-select>\r\n                  </mat-form-field>\r\n                  <mat-form-field *ngIf=\"item.controlType === 'Slider'\">\r\n                    <input matInput placeholder=\"Slider Step\" [(ngModel)]=\"item.sliderStep\"\r\n                    (keyup.enter)=\"onFieldChange($event)\" (blur)=\"onFieldChange($event)\" />\r\n                  </mat-form-field>\r\n                  <mat-form-field *ngIf=\"item.controlType === 'Slider'\">\r\n                    <input matInput placeholder=\"Slider Max\" [(ngModel)]=\"item.sliderMax\"\r\n                    (keyup.enter)=\"onFieldChange($event)\" (blur)=\"onFieldChange($event)\" />\r\n                  </mat-form-field>\r\n                  <mat-form-field *ngIf=\"item.controlType === 'Slider'\">\r\n                    <input matInput placeholder=\"Slider Min\" [(ngModel)]=\"item.sliderMin\"\r\n                    (keyup.enter)=\"onFieldChange($event)\" (blur)=\"onFieldChange($event)\" />\r\n                  </mat-form-field>\r\n                </div>\r\n              </mat-expansion-panel>\r\n            </mat-accordion>\r\n          </td>\r\n        </tr>\r\n      </tbody>\r\n\r\n    </table>\r\n\r\n    <div class=\"m-t-10 m-b-10\">\r\n      <button mat-raised-button color=\"accent\" (click)=\"addParametr()\">+ Add parameter</button>\r\n    </div>\r\n\r\n    <div class=\"loop-item\">\r\n      <mat-form-field class=\"example-full-width\">\r\n        <input matInput placeholder=\"Id (latin simbols and digits)\" (keydown)=\"onKeyDown($event)\" [(ngModel)]=\"newParametr.id\" />\r\n      </mat-form-field>\r\n      <mat-form-field class=\"example-full-width\">\r\n        <input matInput placeholder=\"Name\" [(ngModel)]=\"newParametr.name\" />\r\n      </mat-form-field>\r\n      <mat-form-field class=\"example-full-width\">\r\n        <textarea matInput placeholder=\"Description\" [(ngModel)]=\"newParametr.description\"></textarea>\r\n      </mat-form-field>\r\n      <div class=\"input-btn-wrap\">\r\n        <mat-form-field class=\"example-full-width\">\r\n          <input matInput placeholder=\"Value\" [(ngModel)]=\"newParametr.value\" />\r\n        </mat-form-field>\r\n        <button (click)=\"openDialog(newParametr)\" mat-raised-button color=\"primary\" class=\"btn\">\r\n          <i>\r\n            f(x)\r\n          </i>\r\n        </button>\r\n      </div>\r\n      <mat-form-field>\r\n        <mat-label>Feature label</mat-label>\r\n        <mat-select [(ngModel)]=\"newParametr.featureLabelNone\">\r\n          <mat-option value=\"1\">\r\n            1\r\n          </mat-option>\r\n          <mat-option value=\"2\">\r\n            2\r\n          </mat-option>\r\n          <mat-option value=\"3\">\r\n            3\r\n          </mat-option>\r\n        </mat-select>\r\n      </mat-form-field>\r\n      <div class=\"chekboxs-list\">\r\n        <mat-checkbox [(ngModel)]=\"newParametr.measurable\">Measurable</mat-checkbox>\r\n        <mat-checkbox [(ngModel)]=\"newParametr.changeable\">Changeable</mat-checkbox>\r\n        <mat-checkbox [(ngModel)]=\"newParametr.showOnDiagram\">Show on diagram</mat-checkbox>\r\n        <mat-checkbox [(ngModel)]=\"newParametr.showName\">Show name</mat-checkbox>\r\n      </div>\r\n      <mat-form-field *ngIf=\"newParametr.showOnDiagram\">\r\n        <mat-label>Control type</mat-label>\r\n        <mat-select [(ngModel)]=\"newParametr.controlType\">\r\n          <mat-option value=\"Value\">\r\n            Value\r\n          </mat-option>\r\n          <mat-option value=\"Input\">\r\n            Input\r\n          </mat-option>\r\n          <mat-option value=\"Slider\">\r\n            Slider\r\n          </mat-option>\r\n        </mat-select>\r\n      </mat-form-field>\r\n      <mat-form-field *ngIf=\"newParametr.controlType === 'Slider'\">\r\n        <input matInput placeholder=\"Slider Step\" [(ngModel)]=\"newParametr.sliderStep\" />\r\n      </mat-form-field>\r\n      <mat-form-field *ngIf=\"newParametr.controlType === 'Slider'\">\r\n        <input matInput placeholder=\"Slider Max\" [(ngModel)]=\"newParametr.sliderMax\" />\r\n      </mat-form-field>\r\n      <mat-form-field *ngIf=\"newParametr.controlType === 'Slider'\">\r\n        <input matInput placeholder=\"Slider Min\" [(ngModel)]=\"newParametr.sliderMin\" />\r\n      </mat-form-field>\r\n    </div>\r\n  </div>\r\n</div>\r\n"
+module.exports = "\n<input #file  onclick=\"this.value=null;\" type=\"file\" (change)=\"onChange($event)\"  style=\"display: none;\"/>\n\n\n<div class=\"bpm-wrap\">\n  <div class=\"palette-entries\">\n    <div *ngFor=\"let item of types\" class=\"bpm-item\">\n      <div [id]=\"item\" [draggable]=\"true\" [ngStyle]=\"{'background': colors[item]}\"\n       class=\"square\" [title]=\"item\" tooltipPosition=\"top\">\n      {{item}}\n      </div>\n    </div>\n  </div>\n  <!-- <div class=\"player-button\">\n      <div class=\"wrap\">\n        <button (click)=\"switchPlayer()\" mat-icon-button>\n          <i *ngIf=\"this.readOnly\" class=\"material-icons\">\n            radio_button_checked\n          </i>\n          <i  *ngIf=\"!this.readOnly\" class=\"material-icons\">\n            radio_button_unchecked\n          </i>\n        </button>\n          <button (click)=\"generateCSVPatern()\" mat-icon-button>\n            <i class=\"material-icons\">\n                table_chart\n            </i>\n          </button>\n          <button (click)=\"file.click()\" mat-icon-button>\n            <i class=\"material-icons\">\n              folder\n            </i>\n          </button>\n          <button (click)=\"generateCSVFull()\" mat-icon-button>\n            <i class=\"material-icons\">\n              cloud_download\n            </i>\n          </button>\n      </div>\n  </div> -->\n  <div class=\"coco-bpm-graph\" id=\"graph\" style=\"height: calc(100vh - 60px);\"></div>\n  <!-- <div class=\"clickShield\" *ngIf=\"showSide\" (click)=\"showSide = false\"></div> -->\n  <div (click)=\"showSide = !showSide\" class=\"toggle-sidebar-btn\" [ngClass]=\"{ 'active': showSide }\">\n    <a mat-raised-button>\n      <i class=\"material-icons\">\n        menu_open\n      </i>\n    </a>\n  </div>\n  <div [ngClass]=\"{ show: showSide }\" *ngIf=\"selectedModal\" class=\"sidebar show\">\n    <mat-form-field class=\"example-full-width\">\n      <mat-label>Id (latin simbols and digits)</mat-label>\n      <input id=\"dataId\" matInput [(ngModel)]=\"data[selectedModal].id\" (keydown)=\"onKeyDown($event)\"\n      (ngModelChange)=\"idModelChange($event)\"\n      (keyup.enter)=\"onFieldChangeId($event)\" (blur)=\"onFieldChangeId($event)\"/>\n    </mat-form-field>\n    <mat-form-field class=\"example-full-width\">\n      <mat-label>Name</mat-label>\n      <input matInput [(ngModel)]=\"data[selectedModal].name\"\n      (keyup.enter)=\"onFieldChange($event)\" (blur)=\"onFieldChange($event)\" />\n    </mat-form-field>\n    <mat-form-field>\n      <mat-label>ObjectClass</mat-label>\n      <mat-select [(ngModel)]=\"data[selectedModal].objectClass\"\n      (keyup.enter)=\"onFieldChange($event)\" (blur)=\"onFieldChange($event)\">\n        <mat-option value=\"Board\">\n          Board\n        </mat-option>\n        <mat-option value=\"Input\">\n          Input\n        </mat-option>\n        <mat-option value=\"Output\">\n          Output\n        </mat-option>\n        <mat-option value=\"InputOutput\">\n          InputOutput\n        </mat-option>\n        <mat-option value=\"Process\">\n          Process\n        </mat-option>\n        <mat-option value=\"Min\">\n          Min\n        </mat-option>\n        <mat-option value=\"Max\">\n          Max\n        </mat-option>\n      </mat-select>\n    </mat-form-field>\n    <mat-form-field class=\"example-full-width\">\n      <input matInput placeholder=\"ObjectType\" [(ngModel)]=\"data[selectedModal].objectType\"\n      (keyup.enter)=\"onFieldChange($event)\" (blur)=\"onFieldChange($event)\" />\n    </mat-form-field>\n    <mat-form-field class=\"example-full-width\">\n      <textarea matInput placeholder=\"Description\" [(ngModel)]=\"data[selectedModal].description\"\n      (keyup.enter)=\"onFieldChange($event)\" (blur)=\"onFieldChange($event)\"></textarea>\n    </mat-form-field>\n    <!-- <div class=\"input-btn-wrap\">\n      <mat-form-field class=\"example-full-width\">\n        <input readonly [(ngModel)]=\"picture\" matInput placeholder=\"Picture\" />\n      </mat-form-field>\n      <input #file [(ngModel)]=\"picture\" hidden type=\"file\" />\n      <button (click)=\"file.click()\" mat-raised-button color=\"primary\" class=\"btn\">\n        <i class=\"material-icons\">\n          forward\n        </i>\n      </button>\n    </div> -->\n    <table class=\"table\">\n      <tr>\n        <th style=\"text-align: left;\">Parameters</th>\n        <th></th>\n        <th>M</th>\n        <th>C</th>\n        <th>S</th>\n        <th></th>\n      </tr>\n\n      <tbody *ngFor=\"let item of data[selectedModal].parameters.slice().reverse(); let i = index\">\n        <tr>\n          <td>\n            {{item.name}}\n          </td>\n          <td>\n            <mat-form-field *ngIf=\"(item.value && item.value.charAt(0) !== '=') || !item.value\" class=\"example-full-width table-input\">\n              <input matInput [(ngModel)]=\"item.value\"\n              (keyup.enter)=\"onFieldChange($event)\" (blur)=\"onFieldChange($event);validValue(item, index)\" />\n            </mat-form-field>\n            <span *ngIf=\"item.value && item.value.charAt(0) === '=' \">\n              f (x)\n            </span>\n          </td>\n          <td>\n            <div class=\"df jc-c\">\n              <mat-checkbox [(ngModel)]=\"item.measurable\"\n              (ngModelChange)=\"onFieldChange($event)\"></mat-checkbox>\n            </div>\n          </td>\n          <td>\n            <div class=\"df jc-c\">\n              <mat-checkbox [(ngModel)]=\"item.changeable\"\n              (ngModelChange)=\"onFieldChange($event)\" (blur)=\"onFieldChange($event)\"></mat-checkbox>\n            </div>\n          </td>\n          <td>\n            <div class=\"df jc-c\">\n              <mat-checkbox [(ngModel)]=\"item.showOnDiagram\"\n              (ngModelChange)=\"onFieldChange($event)\" (blur)=\"onFieldChange($event)\"></mat-checkbox>\n            </div>\n          </td>\n          <td>\n            <div class=\"df jc-c ai-c\">\n              <button class=\"table-more-btn\" mat-icon-button\n                (click)=\"optionsModal[item._id + index] = !optionsModal[item._id + index]\">\n                <i class=\"material-icons-outlined\">\n                  arrow_drop_down_circle\n                </i>\n              </button>\n            </div>\n          </td>\n        </tr>\n        <tr *ngIf=\"optionsModal[item._id + index]\">\n          <td colspan=\"6\">\n            <mat-accordion>\n              <mat-expansion-panel [expanded]=\"true\">\n                <mat-expansion-panel-header>\n                  <mat-panel-title>\n                    Personal data\n                  </mat-panel-title>\n                </mat-expansion-panel-header>\n\n                <div class=\"loop-item desc\">\n                  <mat-form-field class=\"example-full-width\">\n                    <input matInput placeholder=\"Id (latin simbols and digits)\" (keydown)=\"onKeyDown($event)\" [(ngModel)]=\"item.id\"\n                    (keyup.enter)=\"onFieldChange($event)\" (blur)=\"onFieldChange($event)\" />\n                  </mat-form-field>\n                  <mat-form-field class=\"example-full-width\">\n                    <input matInput placeholder=\"Name\" [(ngModel)]=\"item.name\"\n                    (keyup.enter)=\"onFieldChange($event)\" (blur)=\"onFieldChange($event)\" />\n                  </mat-form-field>\n                  <mat-form-field class=\"example-full-width\">\n                    <textarea matInput placeholder=\"Description\" [(ngModel)]=\"item.description\"\n                    (keyup.enter)=\"onFieldChange($event)\" (blur)=\"onFieldChange($event)\"></textarea>\n                  </mat-form-field>\n                  <div class=\"input-btn-wrap\">\n                    <mat-form-field *ngIf=\"item.value && item.value.charAt(0) !== '=' \" class=\"example-full-width\">\n                      <input matInput placeholder=\"Value\" [(ngModel)]=\"item.value\"\n                      (keyup.enter)=\"onFieldChange($event)\" (blur)=\"onFieldChange($event);validValue(item,index)\"/>\n                    </mat-form-field>\n                    <span *ngIf=\"item.value && item.value.charAt(0) === '=' \" class=\"example-full-width\">Value = f (x)</span>\n\n                    <button (click)=\"openDialog(item)\" mat-raised-button color=\"primary\" class=\"btn\">\n                      <i>\n                        f(x)\n                      </i>\n                    </button>\n                  </div>\n                  <mat-form-field>\n                    <mat-label>Feature label</mat-label>\n                    <mat-select>\n                      <mat-option value=\"1\">\n                        1\n                      </mat-option>\n                      <mat-option value=\"2\">\n                        2\n                      </mat-option>\n                      <mat-option value=\"3\">\n                        3\n                      </mat-option>\n                    </mat-select>\n                  </mat-form-field>\n                  <div class=\"chekboxs-list\">\n                    <mat-checkbox [(ngModel)]=\"item.measurable\"\n                    (ngModelChange)=\"onFieldChange($event)\" (blur)=\"onFieldChange($event)\">Measurable\n                    </mat-checkbox>\n                    <mat-checkbox [(ngModel)]=\"item.changeable\"\n                    (ngModelChange)=\"onFieldChange($event)\" (blur)=\"onFieldChange($event)\">Changeable\n                    </mat-checkbox>\n                    <mat-checkbox [(ngModel)]=\"item.showOnDiagram\"\n                    (ngModelChange)=\"onFieldChange($event)\" (blur)=\"onFieldChange($event)\">Show on\n                      diagram</mat-checkbox>\n                    <mat-checkbox [(ngModel)]=\"item.showName\"\n                    (ngModelChange)=\"onFieldChange($event)\" (blur)=\"onFieldChange($event)\">Show name\n                    </mat-checkbox>\n                  </div>\n                  <mat-form-field *ngIf=\"item.showOnDiagram\">\n                    <mat-label>Control type</mat-label>\n                    <mat-select [(ngModel)]=\"item.controlType\"\n                    (keyup.enter)=\"onFieldChange($event);\" (blur)=\"onFieldChange($event);sliderChange($event, item, index)\">\n                      <mat-option value=\"Value\">\n                        Value\n                      </mat-option>\n                      <mat-option value=\"Input\">\n                        Input\n                      </mat-option>\n                      <mat-option value=\"Slider\">\n                        Slider\n                      </mat-option>\n                    </mat-select>\n                  </mat-form-field>\n                  <mat-form-field *ngIf=\"item.controlType === 'Slider'\">\n                    <input matInput placeholder=\"Slider Step\" [(ngModel)]=\"item.sliderStep\"\n                    (keyup.enter)=\"onFieldChange($event)\" (blur)=\"onFieldChange($event)\" />\n                  </mat-form-field>\n                  <mat-form-field *ngIf=\"item.controlType === 'Slider'\">\n                    <input matInput placeholder=\"Slider Max\" [(ngModel)]=\"item.sliderMax\"\n                    (keyup.enter)=\"onFieldChange($event)\" (blur)=\"onFieldChange($event)\" />\n                  </mat-form-field>\n                  <mat-form-field *ngIf=\"item.controlType === 'Slider'\">\n                    <input matInput placeholder=\"Slider Min\" [(ngModel)]=\"item.sliderMin\"\n                    (keyup.enter)=\"onFieldChange($event)\" (blur)=\"onFieldChange($event)\" />\n                  </mat-form-field>\n                </div>\n              </mat-expansion-panel>\n            </mat-accordion>\n          </td>\n        </tr>\n      </tbody>\n\n    </table>\n\n    <div class=\"m-t-10 m-b-10\">\n      <button mat-raised-button color=\"accent\" (click)=\"addParametr()\">+ Add parameter</button>\n    </div>\n\n    <div class=\"loop-item\">\n      <mat-form-field class=\"example-full-width\">\n        <input matInput placeholder=\"Id (latin simbols and digits)\" (keydown)=\"onKeyDown($event)\" [(ngModel)]=\"newParametr.id\" />\n      </mat-form-field>\n      <mat-form-field class=\"example-full-width\">\n        <input matInput placeholder=\"Name\" [(ngModel)]=\"newParametr.name\" />\n      </mat-form-field>\n      <mat-form-field class=\"example-full-width\">\n        <textarea matInput placeholder=\"Description\" [(ngModel)]=\"newParametr.description\"></textarea>\n      </mat-form-field>\n      <div class=\"input-btn-wrap\">\n        <mat-form-field class=\"example-full-width\">\n          <input matInput placeholder=\"Value\" [(ngModel)]=\"newParametr.value\" />\n        </mat-form-field>\n        <button (click)=\"openDialog(newParametr)\" mat-raised-button color=\"primary\" class=\"btn\">\n          <i>\n            f(x)\n          </i>\n        </button>\n      </div>\n      <mat-form-field>\n        <mat-label>Feature label</mat-label>\n        <mat-select [(ngModel)]=\"newParametr.featureLabelNone\">\n          <mat-option value=\"1\">\n            1\n          </mat-option>\n          <mat-option value=\"2\">\n            2\n          </mat-option>\n          <mat-option value=\"3\">\n            3\n          </mat-option>\n        </mat-select>\n      </mat-form-field>\n      <div class=\"chekboxs-list\">\n        <mat-checkbox [(ngModel)]=\"newParametr.measurable\">Measurable</mat-checkbox>\n        <mat-checkbox [(ngModel)]=\"newParametr.changeable\">Changeable</mat-checkbox>\n        <mat-checkbox [(ngModel)]=\"newParametr.showOnDiagram\">Show on diagram</mat-checkbox>\n        <mat-checkbox [(ngModel)]=\"newParametr.showName\">Show name</mat-checkbox>\n      </div>\n      <mat-form-field *ngIf=\"newParametr.showOnDiagram\">\n        <mat-label>Control type</mat-label>\n        <mat-select [(ngModel)]=\"newParametr.controlType\">\n          <mat-option value=\"Value\">\n            Value\n          </mat-option>\n          <mat-option value=\"Input\">\n            Input\n          </mat-option>\n          <mat-option value=\"Slider\">\n            Slider\n          </mat-option>\n        </mat-select>\n      </mat-form-field>\n      <mat-form-field *ngIf=\"newParametr.controlType === 'Slider'\">\n        <input matInput placeholder=\"Slider Step\" [(ngModel)]=\"newParametr.sliderStep\" />\n      </mat-form-field>\n      <mat-form-field *ngIf=\"newParametr.controlType === 'Slider'\">\n        <input matInput placeholder=\"Slider Max\" [(ngModel)]=\"newParametr.sliderMax\" />\n      </mat-form-field>\n      <mat-form-field *ngIf=\"newParametr.controlType === 'Slider'\">\n        <input matInput placeholder=\"Slider Min\" [(ngModel)]=\"newParametr.sliderMin\" />\n      </mat-form-field>\n    </div>\n  </div>\n</div>\n"
 
 /***/ }),
 
@@ -1515,7 +1671,7 @@ module.exports = "<div class=\"bpm-wrap\">\r\n  <div class=\"palette-entries\">\
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = ".bpm-wrap {\n  position: relative;\n  width: 100%;\n  height: 100%;\n  background: white;\n  border: 1px solid #ececec;\n  overflow: hidden;\n  min-height: calc(100vh - 58px); }\n\n.palette-entries {\n  position: absolute;\n  padding: 5px 0;\n  left: 20px;\n  top: 20px;\n  width: 94px;\n  border-radius: 5px;\n  background: #fafafa;\n  border: 1px solid #ccc;\n  display: flex;\n  flex-wrap: wrap; }\n\n.palette-entries .bpm-item {\n    width: 100%;\n    height: 25px;\n    line-height: 46px;\n    cursor: default;\n    display: flex;\n    align-items: center;\n    justify-content: center; }\n\n.palette-entries .bpm-item .icon {\n      color: #333;\n      font-size: 30px; }\n\n.palette-entries .bpm-item:hover .icon {\n      color: #ff7400; }\n\n.palette-entries .bpm-item .square {\n      width: calc(100% - 10px);\n      height: 23px;\n      border-radius: 5px;\n      border: 2px solid;\n      display: flex;\n      align-items: center;\n      font-size: 13px;\n      padding-left: 3px; }\n\n.palette-entries .separator {\n    margin: 0 5px;\n    padding-top: 5px;\n    border: none;\n    border-bottom: 1px solid #ddd;\n    clear: both;\n    width: 100%; }\n\n.sidebar {\n  position: absolute;\n  width: 100%;\n  max-width: 400px;\n  background-color: white;\n  -webkit-transform: translate(100%, 0);\n          transform: translate(100%, 0);\n  transition: all 0.4s;\n  height: 100%;\n  right: 0;\n  top: 0;\n  padding: 15px;\n  overflow-y: auto; }\n\n.sidebar.show {\n    -webkit-transform: translate(0, 0);\n            transform: translate(0, 0);\n    box-shadow: rgba(0, 0, 0, 0.1) -8px 0px 5px -4px;\n    z-index: 111; }\n\nmat-form-field {\n  display: block; }\n\n.input-btn-wrap {\n  display: flex;\n  align-items: center; }\n\n.input-btn-wrap mat-form-field {\n    width: 100%; }\n\n.input-btn-wrap button.btn {\n    min-width: 0;\n    padding: 0 6px;\n    margin-left: 25px;\n    min-width: 35px; }\n\n.input-btn-wrap button.btn .material-icons {\n      -webkit-transform: rotate(-90deg);\n              transform: rotate(-90deg); }\n\ntable {\n  width: 100%; }\n\ntable td {\n    padding: 0; }\n\ntable th {\n    padding: 0; }\n\n.chekboxs-list {\n  display: flex;\n  flex-wrap: wrap;\n  margin-top: 10px;\n  margin-bottom: 5px; }\n\n.chekboxs-list mat-checkbox {\n    width: 50%; }\n\n.loop-item {\n  padding-bottom: 20px;\n  border-bottom: 1px dashed #b7b7b7;\n  padding: 5px 10px;\n  padding-bottom: 10px;\n  border: 1px dashed #b7b7b7; }\n\n.loop-item.desc {\n    padding: 0 !important;\n    border: none !important; }\n\n.clickShield {\n  position: fixed;\n  background: #0000003d;\n  width: 100%;\n  height: 100%;\n  top: 0; }\n\n.toggle-sidebar-btn {\n  position: absolute;\n  top: calc(50% - 18px);\n  right: 0;\n  transition: all .4s; }\n\n.toggle-sidebar-btn.active {\n    -webkit-transform: translate(-400px, 0);\n            transform: translate(-400px, 0); }\n\n.toggle-sidebar-btn a {\n    width: 29px;\n    min-width: unset;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    padding: 0; }\n"
+module.exports = ".bpm-wrap {\n  position: relative;\n  width: 100%;\n  height: 100%;\n  background: white;\n  border: 1px solid #ececec;\n  overflow: hidden;\n  min-height: calc(100vh - 58px); }\n\n.player-button {\n  position: absolute;\n  padding: 5px 0;\n  left: 31px;\n  top: 69%;\n  width: 44px;\n  border-radius: 5px;\n  background: #fafafa;\n  border: 1px solid #ccc;\n  display: flex;\n  flex-wrap: wrap; }\n\n.player-button .wrap {\n    display: -ms-grid;\n    display: grid; }\n\n.palette-entries {\n  position: absolute;\n  padding: 5px 0;\n  left: 20px;\n  top: 20px;\n  width: 94px;\n  border-radius: 5px;\n  background: #fafafa;\n  border: 1px solid #ccc;\n  display: flex;\n  flex-wrap: wrap; }\n\n.palette-entries .bpm-item {\n    width: 100%;\n    height: 25px;\n    line-height: 46px;\n    cursor: default;\n    display: flex;\n    align-items: center;\n    justify-content: center; }\n\n.palette-entries .bpm-item .icon {\n      color: #333;\n      font-size: 30px; }\n\n.palette-entries .bpm-item:hover .icon {\n      color: #ff7400; }\n\n.palette-entries .bpm-item .square {\n      width: calc(100% - 10px);\n      height: 23px;\n      border-radius: 5px;\n      border: 2px solid;\n      display: flex;\n      align-items: center;\n      font-size: 13px;\n      padding-left: 3px; }\n\n.palette-entries .separator {\n    margin: 0 5px;\n    padding-top: 5px;\n    border: none;\n    border-bottom: 1px solid #ddd;\n    clear: both;\n    width: 100%; }\n\n.sidebar {\n  position: absolute;\n  width: 100%;\n  max-width: 400px;\n  background-color: white;\n  -webkit-transform: translate(100%, 0);\n          transform: translate(100%, 0);\n  transition: all 0.4s;\n  height: 100%;\n  right: 0;\n  top: 0;\n  padding: 15px;\n  overflow-y: auto; }\n\n.sidebar.show {\n    -webkit-transform: translate(0, 0);\n            transform: translate(0, 0);\n    box-shadow: rgba(0, 0, 0, 0.1) -8px 0px 5px -4px;\n    z-index: 111; }\n\nmat-form-field {\n  display: block; }\n\n.input-btn-wrap {\n  display: flex;\n  align-items: center; }\n\n.input-btn-wrap mat-form-field {\n    width: 100%; }\n\n.input-btn-wrap button.btn {\n    min-width: 0;\n    padding: 0 6px;\n    margin-left: 25px;\n    min-width: 35px; }\n\n.input-btn-wrap button.btn .material-icons {\n      -webkit-transform: rotate(-90deg);\n              transform: rotate(-90deg); }\n\ntable {\n  width: 100%; }\n\ntable td {\n    padding: 0; }\n\ntable th {\n    padding: 0; }\n\n.chekboxs-list {\n  display: flex;\n  flex-wrap: wrap;\n  margin-top: 10px;\n  margin-bottom: 5px; }\n\n.chekboxs-list mat-checkbox {\n    width: 50%; }\n\n.loop-item {\n  padding-bottom: 20px;\n  border-bottom: 1px dashed #b7b7b7;\n  padding: 5px 10px;\n  padding-bottom: 10px;\n  border: 1px dashed #b7b7b7; }\n\n.loop-item.desc {\n    padding: 0 !important;\n    border: none !important; }\n\n.clickShield {\n  position: fixed;\n  background: #0000003d;\n  width: 100%;\n  height: 100%;\n  top: 0; }\n\n.toggle-sidebar-btn {\n  position: absolute;\n  top: calc(50% - 18px);\n  right: 0;\n  transition: all .4s; }\n\n.toggle-sidebar-btn.active {\n    -webkit-transform: translate(-400px, 0);\n            transform: translate(-400px, 0); }\n\n.toggle-sidebar-btn a {\n    width: 29px;\n    min-width: unset;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    padding: 0; }\n"
 
 /***/ }),
 
@@ -1537,7 +1693,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _shared_model__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../shared/model */ "./src/app/shared/model.ts");
 /* harmony import */ var _angular_router__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @angular/router */ "./node_modules/@angular/router/fesm5/router.js");
 /* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! rxjs */ "./node_modules/rxjs/_esm5/index.js");
-/* harmony import */ var _auth_auth_service__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../auth/auth.service */ "./src/app/auth/auth.service.ts");
+/* harmony import */ var rxjs_internal_operators__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! rxjs/internal/operators */ "./node_modules/rxjs/internal/operators/index.js");
+/* harmony import */ var rxjs_internal_operators__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(rxjs_internal_operators__WEBPACK_IMPORTED_MODULE_8__);
+/* harmony import */ var _auth_auth_service__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../auth/auth.service */ "./src/app/auth/auth.service.ts");
+/* harmony import */ var _shared_components_dialog_create_model_dialog_create_model_component__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../shared/components/dialog-create-model/dialog-create-model.component */ "./src/app/shared/components/dialog-create-model/dialog-create-model.component.ts");
+/* harmony import */ var _angular_common_http__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @angular/common/http */ "./node_modules/@angular/common/fesm5/http.js");
+/* harmony import */ var _shared_components_player_player_service__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../shared/components/player/player.service */ "./src/app/shared/components/player/player.service.ts");
 var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -1556,14 +1717,20 @@ var __metadata = (undefined && undefined.__metadata) || function (k, v) {
 
 
 
+
+
+
+
 var ModelMainComponent = /** @class */ (function () {
-    function ModelMainComponent(modelService, componentService, dialog, authService, activatedRoute) {
+    function ModelMainComponent(modelService, componentService, dialog, authService, activatedRoute, http, playerService) {
         var _this = this;
         this.modelService = modelService;
         this.componentService = componentService;
         this.dialog = dialog;
         this.authService = authService;
         this.activatedRoute = activatedRoute;
+        this.http = http;
+        this.playerService = playerService;
         this.types = [
             "Input",
             "Output",
@@ -1587,8 +1754,10 @@ var ModelMainComponent = /** @class */ (function () {
         this.formulaSaverOld = {};
         this.saverComponent = [];
         this.modelsKeys = {};
+        this.copyIndexCounter = {};
         this.formulaSaver = {};
         this.txtQueryChanged = new rxjs__WEBPACK_IMPORTED_MODULE_7__["Subject"]();
+        this.txtQueryChangedDebounce = new rxjs__WEBPACK_IMPORTED_MODULE_7__["Subject"]();
         this.newParametr = new _shared_model__WEBPACK_IMPORTED_MODULE_5__["ParameterClass"]("", "", "0", "");
         this.modelId = this.activatedRoute.snapshot.paramMap.get('id');
         this.authService.me().subscribe(function (data) {
@@ -1600,63 +1769,182 @@ var ModelMainComponent = /** @class */ (function () {
                 });
                 _this.modelList = data;
                 _this.modelList.forEach(function (model) {
+                    if (_this.modelId === model._id) {
+                        _this.modelID = model.id;
+                    }
                     _this.modelsKeys[model._id] = model.id;
                 });
-                _this.componentService.getAllById(_this.modelId).subscribe(function (data) {
-                    _this.data = data;
-                    _this.saverComponent = [JSON.parse(JSON.stringify(_this.data))];
-                    console.log(data);
-                    _this.calc();
-                    setTimeout(function () {
-                        _this.removeAll();
-                        _this.drowLines();
-                        _this.drow();
-                    }, 1000);
+                _this.modelService.getAll().subscribe(function (data) {
+                    data.forEach(function (element) {
+                        if (element._id === _this.modelId) {
+                            _this.modelService.selectedModelEvent.emit(element);
+                            _this.selectedModalObj = element;
+                        }
+                    });
                 });
+                _this.getData();
             });
         });
-        // this.setInterval = setInterval(() => {
-        //   this.removeAll()
-        //   this.drowLines()
-        //   this.drow();
-        //   this.txtQueryChanged.next(this.uuidv4());
-        // }, 5000);
+        this.setInterval = setInterval(function () {
+            _this.removeAll();
+            _this.drowLines();
+            _this.drow();
+            // this.txtQueryChanged.next(this.uuidv4());
+            console.log(23);
+        }, 5000);
         this.txtQueryChanged
-            // .pipe(debounceTime(800), distinctUntilChanged())
             .subscribe(function (model) {
-            _this.saverComponent.push(JSON.parse(JSON.stringify(_this.data)));
-            var id = _this.data[model.selected];
-            if (id) {
-                _this.componentService.update(id).subscribe(function (data) {
-                });
+            _this.updateQuery(model);
+            // if(!this.cursor){
+            //   this.updateQuery(model);
+            // }
+            // else {
+            //   let obj = this.data[model.selected];
+            //   for (const p of obj.parameters) {
+            //     this.formulaSaver[this.modelID + "." + obj.id + "." + p.id] = p.value;
+            //   }
+            //   this.setDataPlayer(null);
+            // }
+        });
+        this.txtQueryChangedDebounce
+            .pipe(Object(rxjs_internal_operators__WEBPACK_IMPORTED_MODULE_8__["debounceTime"])(500), Object(rxjs_internal_operators__WEBPACK_IMPORTED_MODULE_8__["distinctUntilChanged"])())
+            .subscribe(function (model) {
+            _this.updateQuery(model);
+            // if(!this.cursor){
+            //   this.updateQuery(model);
+            // }
+            // else {
+            //   console.log(this.dataPlayer);
+            //   let obj = this.data[model.selected];
+            //   for (const p of obj.parameters) {
+            //     this.formulaSaver[this.modelID + "." + obj.id + "." + p.id] = p.value;
+            //   }
+            //   // this.setDataPlayer(null);
+            // }
+        });
+        this.playerService.cursorEmitter.subscribe(function (cursor) {
+            _this.formulaSaver = {};
+            _this.cursor = cursor;
+            if (_this.readOnly)
+                for (var i = 1; i < _this.dataPlayer.length; i++) {
+                    for (var _i = 0, _a = _this.data; _i < _a.length; _i++) {
+                        var item = _a[_i];
+                        if (item && item.id && item.id.toLowerCase().trim() === _this.dataPlayer[i][0].toLowerCase().trim()) {
+                            for (var _b = 0, _c = item.parameters; _b < _c.length; _b++) {
+                                var param = _c[_b];
+                                if (param.id.toLowerCase().trim() === _this.dataPlayer[i][2].toLowerCase().trim()) {
+                                    param.value = _this.dataPlayer[i][cursor];
+                                    _this.formulaSaver[_this.modelID + "." + item.id + "." + param.id] = _this.dataPlayer[i][cursor];
+                                }
+                                else {
+                                    _this.formulaSaver[_this.modelID + "." + item.id + "." + param.id] = param.value;
+                                }
+                            }
+                        }
+                    }
+                }
+            _this.clear();
+        });
+    }
+    ModelMainComponent.prototype.updateQuery = function (model) {
+        var _this = this;
+        this.saverComponent.push(JSON.parse(JSON.stringify(this.data)));
+        var id = this.data[model.selected];
+        if (id) {
+            this.componentService.update(id).subscribe(function (r) {
                 if (!model.drag) {
                     _this.componentService.getAllByUserId(_this.user._id).subscribe(function (data) {
                         _this.formulaData = data;
                         _this.formulaSaver = {};
-                        _this.calc();
+                        new Promise(function (resolve, reject) { _this.calc(resolve, reject); }).then(function () {
+                            _this.removeAll();
+                            _this.drow();
+                            if (!_this.readOnly) {
+                                _this.setDataPlayer(null);
+                            }
+                        });
                     });
                 }
-            }
-            if (!model.drag)
-                setTimeout(function () {
-                    _this.removeAll();
-                    _this.drow();
-                }, 1000);
+            });
+        }
+    };
+    ModelMainComponent.prototype.getData = function () {
+        var _this = this;
+        this.componentService.getAllById(this.modelId).subscribe(function (data) {
+            _this.data = JSON.parse(JSON.stringify(data));
+            _this.dataCopy = JSON.parse(JSON.stringify(data));
+            _this.saverComponent = _this.saverComponent.concat([JSON.parse(JSON.stringify(_this.data))]);
+            new Promise(function (resolve, reject) { _this.calc(resolve, reject); }).then(function () {
+                _this.removeAll();
+                _this.drowLines();
+                _this.drow();
+            });
         });
-    }
-    ModelMainComponent.prototype.calc = function () {
+    };
+    ModelMainComponent.prototype.onKeyPress = function ($event) {
+        var _this = this;
+        if (($event.ctrlKey || $event.metaKey) && $event.keyCode == 67) {
+            console.log('CTRL + C', this.selected);
+            this.selectedCopyIndex = this.selected;
+        }
+        if (($event.ctrlKey || $event.metaKey) && $event.keyCode == 86) {
+            console.log('CTRL +  V', this.data[this.selectedCopyIndex]);
+            if ((this.selectedCopyIndex || this.selectedCopyIndex === 0) && this.data[this.selectedCopyIndex]) {
+                if (!this.copyIndexCounter[this.selectedCopyIndex]) {
+                    this.copyIndexCounter[this.selectedCopyIndex] = 0;
+                }
+                var obj_1 = JSON.parse(JSON.stringify(this.data[this.selectedCopyIndex]));
+                delete obj_1._id;
+                var id_1 = obj_1.id.slice();
+                obj_1.id = obj_1.id + "1";
+                obj_1.x = obj_1.x + 50;
+                obj_1.y = obj_1.y + 150 + (this.copyIndexCounter[this.selectedCopyIndex] * 80);
+                obj_1.selected = [];
+                obj_1.parameters.forEach(function (p) {
+                    if (p.value && p.value.charAt(0) === "=") {
+                        var re = new RegExp(id_1, 'g');
+                        p.value = p.value.replace(re, obj_1.id).slice();
+                    }
+                });
+                var res = void 0;
+                do {
+                    res = this.data.find(function (el) {
+                        return el.id === obj_1.id;
+                    });
+                    if (res) {
+                        obj_1.id += "1";
+                    }
+                } while (res);
+                this.componentService.create(obj_1).subscribe(function (data) {
+                    _this.componentService.getAllByUserId(_this.user._id).subscribe(function (comp) {
+                        _this.formulaData = comp;
+                        _this.copyIndexCounter[_this.selectedCopyIndex] += 1;
+                        _this.saverComponent.push(JSON.parse(JSON.stringify(_this.data)));
+                        _this.data.push(JSON.parse(JSON.stringify(data)));
+                        _this.clear();
+                        _this.dragType = null;
+                    });
+                });
+            }
+        }
+    };
+    ModelMainComponent.prototype.calc = function (resolve, reject) {
         var _this = this;
         this.data.forEach(function (comp) {
-            comp.parameters.forEach(function (element) {
+            comp.parameters.forEach(function (element, i) {
                 if (element.value) {
                     var v = element.value;
-                    var spcaSpit = v.split(" ");
-                    spcaSpit.forEach(function (element, index) {
+                    var spcaSpit_1 = v.split(" ");
+                    spcaSpit_1.forEach(function (element, index) {
                         var earr = element.split(".");
                         if (earr.length == 3) {
                             if (!_this.formulaSaver[earr[2]] && !_this.formulaSaver[element]) {
                                 _this.formulaSearch(element);
                             }
+                        }
+                        if (comp.parameters.length === (i + 1) && spcaSpit_1.length === (index + 1)) {
+                            if (resolve)
+                                resolve();
                         }
                     });
                 }
@@ -1674,20 +1962,14 @@ var ModelMainComponent = /** @class */ (function () {
         this.startDrowLine = null;
         this.removeAll();
         this.drowLines();
-        console.log(8);
         this.drow();
     };
     ModelMainComponent.prototype.keyEvent = function (event) {
         // if (
         //   (event.keyCode === 46 || event.keyCode === 8) && this.selected
         // ) {
-        //   this.saverComponent.push(JSON.parse(JSON.stringify( this.data )));
-        //   this.componentService.delete(this.data[this.selected]).subscribe((data) => {
-        //     this.data.splice(this.selected, 1);
-        var _this = this;
-        //     this.clear();
-        //   });
         // }
+        var _this = this;
         if (event.keyCode === 90 && (event.ctrlKey || event.metaKey)) {
             this.undo();
         }
@@ -1703,10 +1985,10 @@ var ModelMainComponent = /** @class */ (function () {
         }
         if ((event.keyCode === 46 || event.keyCode === 8) && (this.selectedLineId || this.selectedLineId === 0)) {
             this.selectedLineFrom.selected.forEach(function (id, index) {
-                if (id === _this.selectedLineTo._id) {
+                if (id === _this.selectedLineTo.id) {
                     _this.saverComponent.push(JSON.parse(JSON.stringify(_this.data)));
                     _this.data.forEach(function (element, i) {
-                        if (element._id === _this.selectedLineFrom._id) {
+                        if (element.id === _this.selectedLineFrom.id) {
                             _this.data[i].selected.splice(index, 1);
                             _this.txtQueryChanged.next({
                                 value: _this.selectedLine,
@@ -1741,7 +2023,10 @@ var ModelMainComponent = /** @class */ (function () {
     ModelMainComponent.prototype.ngOnInit = function () {
     };
     ModelMainComponent.prototype.ngOnDestroy = function () {
+        this.modelService.selectedModelEvent.emit(null);
         clearInterval(this.setInterval);
+        this.readOnly = false;
+        this.playerService.closePlayer.emit(this.readOnly);
     };
     ModelMainComponent.prototype.ngAfterViewInit = function () {
         this.init();
@@ -1751,20 +2036,34 @@ var ModelMainComponent = /** @class */ (function () {
         if (this.saverComponent) {
             var arr = this.saverComponent[this.saverComponent.length - 2];
             if (arr && this.saverComponent.length > 1) {
+                var oldData_1 = JSON.parse(JSON.stringify(this.data));
                 this.data = JSON.parse(JSON.stringify(arr));
                 this.saverComponent.pop();
+                var observableList_1 = [];
                 this.data.forEach(function (element) {
-                    _this.componentService.update(element).subscribe(function (data) {
+                    var res = JSON.parse(JSON.stringify(oldData_1)).find(function (el) {
+                        return el.id === element.id;
                     });
+                    if (!res) {
+                        delete element._id;
+                        observableList_1.push(_this.componentService.create(element));
+                    }
+                    else {
+                        observableList_1.push(_this.componentService.update(element));
+                    }
                 });
-                this.componentService.getAllByUserId(this.user._id).subscribe(function (data) {
-                    _this.formulaData = data;
-                    _this.formulaSaver = {};
-                    _this.calc();
-                    // this.removeAll();
-                    // this.drowLines();
-                    // this.clear();
-                    // this.drow();
+                var obs = Object(rxjs__WEBPACK_IMPORTED_MODULE_7__["forkJoin"])(observableList_1);
+                obs.subscribe(function (t) {
+                    _this.componentService.getAllByUserId(_this.user._id).subscribe(function (data) {
+                        _this.formulaData = data;
+                        _this.formulaSaver = {};
+                        _this.calc();
+                        _this.clear();
+                        // this.removeAll();
+                        // this.drowLines();
+                        // this.clear();
+                        // this.drow();
+                    });
                 });
             }
         }
@@ -1944,10 +2243,12 @@ var ModelMainComponent = /** @class */ (function () {
         this.types.forEach(function (type) {
             if (document.getElementById(type)) {
                 document.getElementById(type).addEventListener("dragstart", function (ev) {
-                    ev.dataTransfer.setData('text', 'foo');
-                    _this.dragType = type;
-                    if (_this.isStart && type === "Start") {
-                        event.preventDefault();
+                    if (!_this.readOnly) {
+                        ev.dataTransfer.setData('text', 'foo');
+                        _this.dragType = type;
+                        if (_this.isStart && type === "Start") {
+                            event.preventDefault();
+                        }
                     }
                 }, false);
             }
@@ -1971,6 +2272,7 @@ var ModelMainComponent = /** @class */ (function () {
             model.y = y;
             model.objectClass = _this.dragType;
             model.modelId = _this.modelId;
+            model.modelIdName = _this.modelsKeys[_this.modelId];
             model.userId = _this.user._id;
             model.id = _this.dragType + (_this.data.filter(function (value) { return value.objectClass === _this.dragType; }).length + 1);
             if (_this.dragType !== 'Max' && _this.dragType !== 'Min') {
@@ -1995,7 +2297,6 @@ var ModelMainComponent = /** @class */ (function () {
     ModelMainComponent.prototype.drow = function () {
         var _this = this;
         this.drowLines();
-        console.log(2323);
         this.data.forEach(function (element, index, arr) {
             switch (element.objectClass) {
                 case "Input":
@@ -2010,12 +2311,16 @@ var ModelMainComponent = /** @class */ (function () {
                     dy = element.y - 8;
                     color = _this.colors[element.objectClass];
                     var count_1 = 0;
+                    var countS_1 = 0;
                     element.parameters.forEach(function (param, index) {
                         if (param.showOnDiagram) {
+                            if (param.controlType === "Slider") {
+                                countS_1++;
+                            }
                             count_1++;
                         }
                     });
-                    var h = (60 + (count_1 > 3 ? ((count_1 - 3) * 16 + (count_1 * 5)) : 0));
+                    var h = (65 + (count_1 > 3 ? ((count_1 - 3) * 27 + (countS_1 * 5) + (count_1 * 5)) : 0 + (countS_1 * 5)));
                     var selected = (_this.selected !== null && (+_this.selected === +index)) ? "stroke-width:1;stroke:rgb(0,0,0)" : "";
                     var g_1 = _this.conteiner.append("g").attr("class", "g");
                     g_1.append("rect")
@@ -2044,20 +2349,28 @@ var ModelMainComponent = /** @class */ (function () {
                         }
                     })
                         .on("click", function (d, i, s) {
-                        d3.event.stopPropagation();
-                        if (_this.activeArrow)
-                            _this.shepClick(s[0].id);
+                        if (!_this.readOnly) {
+                            d3.event.stopPropagation();
+                            _this.selectedModal = s[0].id;
+                            _this.selected = s[0].id;
+                            _this.removeAll();
+                            _this.drow();
+                            if (_this.activeArrow)
+                                _this.shepClick(s[0].id);
+                        }
                     })
                         .on("dblclick", function (d, i, s) {
-                        _this.selectedModal = s[0].id;
-                        var name = _this.data[_this.selectedModal].objectClass + (_this.data[_this.selectedModal].parameters.length + 1);
-                        _this.newParametr = new _shared_model__WEBPACK_IMPORTED_MODULE_5__["ParameterClass"]("Par" + (_this.data.filter(function (value) { return value.objectClass === _this.data[_this.selectedModal].objectClass; }).length + 1), "", "0");
-                        _this.showSide = true;
-                        _this.selected = s[0].id;
-                        _this.removeAll();
-                        _this.drow();
-                        _this.activeArrow = null;
-                        _this.startDrowLine = null;
+                        if (!_this.readOnly) {
+                            _this.selectedModal = s[0].id;
+                            var name_1 = _this.data[_this.selectedModal].objectClass + (_this.data[_this.selectedModal].parameters.length + 1);
+                            _this.newParametr = new _shared_model__WEBPACK_IMPORTED_MODULE_5__["ParameterClass"]("Par" + (_this.data.filter(function (value) { return value.objectClass === _this.data[_this.selectedModal].objectClass; }).length + 1), "", "0");
+                            _this.showSide = true;
+                            _this.selected = s[0].id;
+                            _this.removeAll();
+                            _this.drow();
+                            _this.activeArrow = null;
+                            _this.startDrowLine = null;
+                        }
                     });
                     g_1.append("text")
                         .attr("x", element.x - 5)
@@ -2068,29 +2381,75 @@ var ModelMainComponent = /** @class */ (function () {
                         .attr("x", element.x + 140)
                         .attr("y", element.y - 13)
                         .text("X")
+                        .attr("cursor", "pointer")
                         .on("click", function (d, i, s) {
-                        d3.event.stopPropagation();
-                        var id = s[0].id.split("-")[0];
-                        _this.componentService.delete(_this.data[id]).subscribe(function (data) {
-                            _this.data.splice(id, 1);
-                            _this.clear();
-                        });
+                        if (!_this.readOnly) {
+                            d3.event.stopPropagation();
+                            var id_2 = s[0].id.split("-")[0];
+                            // this.componentService.delete(this.data[id]).subscribe((data) => {
+                            //   this.data.splice(id, 1);
+                            //   this.clear();
+                            // });
+                            var dialogRef = _this.dialog.open(_shared_components_dialog_create_model_dialog_create_model_component__WEBPACK_IMPORTED_MODULE_10__["DialogCreateModelComponent"], {
+                                width: '450px',
+                                data: {
+                                    label: 'You delete the object! Are you sure?',
+                                    deleteMode: true
+                                }
+                            });
+                            dialogRef.afterClosed().subscribe(function (model) {
+                                if (model) {
+                                    console.log(_this.saverComponent);
+                                    _this.saverComponent.push(JSON.parse(JSON.stringify(_this.data)));
+                                    console.log(_this.saverComponent);
+                                    var observableList_2 = [];
+                                    _this.componentService.getAllByUserId(_this.user._id).subscribe(function (data) {
+                                        _this.formulaData = data;
+                                        _this.formulaData.forEach(function (comp) {
+                                            comp.parameters.forEach(function (param) {
+                                                if (param.value && param.value.charAt(0) === "=") {
+                                                    _this.data[id_2].parameters.forEach(function (p) {
+                                                        var element = _this.data[id_2].modelIdName + "." +
+                                                            _this.data[id_2].id + "." + p.id;
+                                                        var re = new RegExp(element, 'g');
+                                                        param.value = param.value.replace(re, "0");
+                                                    });
+                                                }
+                                            });
+                                            observableList_2.push(_this.componentService.update(comp));
+                                        });
+                                        var obs = Object(rxjs__WEBPACK_IMPORTED_MODULE_7__["forkJoin"])(observableList_2);
+                                        obs.subscribe(function (t) {
+                                            _this.componentService.delete(_this.data[id_2]).subscribe(function (data) {
+                                                _this.selectedModal = null;
+                                                _this.selected = null;
+                                                _this.getData();
+                                            });
+                                        });
+                                    });
+                                }
+                            });
+                        }
                     });
                     g_1.append("text")
                         .attr("id", index + "-arrow")
                         .attr("x", element.x + 135)
                         .attr("y", element.y + 5)
                         .text("=>")
+                        .attr("cursor", "pointer")
                         .on("click", function (d, i, s) {
-                        d3.event.stopPropagation();
-                        var id = s[0].id.split("-")[0];
-                        _this.shepClick(id);
+                        if (!_this.readOnly) {
+                            d3.event.stopPropagation();
+                            var id = s[0].id.split("-")[0];
+                            _this.shepClick(id);
+                        }
                     });
                     g_1.append("text")
                         .attr("id", index + "-drag")
                         .attr("x", element.x)
                         .attr("y", element.y + 5)
                         .text("|||")
+                        .attr("cursor", "pointer")
                         .call(d3
                         .drag()
                         .on("start", dragstarted)
@@ -2100,36 +2459,40 @@ var ModelMainComponent = /** @class */ (function () {
                     var parameters = element.parameters.slice();
                     parameters.forEach(function (param, paramIndex) {
                         if (param.showOnDiagram) {
-                            var py = element.y + 70 - 50 - (countIndex_1 * 20) + (count_1 >= 3 ? ((count_1 - 3) * 16 + (count_1 * 7)) : (count_1 > 1) ? (count_1 * 4) : -9);
+                            var py = element.y + 79 - 50 - (countIndex_1 * 24) + (count_1 >= 3 ?
+                                ((count_1 - 3) * 24 + (count_1 * 7)) :
+                                (count_1 > 1) ? (count_1 * 4) : -9);
                             switch (param.controlType) {
                                 case "Value":
                                 case "":
                                     var v = param.value;
                                     if (v && v.charAt(0) === "=") {
-                                        var spcaSpit_1 = v.split(" ");
-                                        spcaSpit_1.forEach(function (element, index) {
+                                        var spcaSpit_2 = v.split(" ");
+                                        spcaSpit_2.forEach(function (element, index) {
                                             var earr = element.split(".");
                                             if (earr.length == 3) {
-                                                spcaSpit_1[index] = _this.formulaSaver[element];
+                                                spcaSpit_2[index] = _this.formulaSaver[element];
                                             }
                                         });
-                                        spcaSpit_1.shift();
+                                        spcaSpit_2.shift();
                                         try {
-                                            _this.formulaSaver[_this.modelsKeys[element.modelId] + "." + element.id + "." + param.id] = _this.notEval(spcaSpit_1.join(''));
+                                            _this.formulaSaver[_this.modelsKeys[element.modelId] + "." + element.id + "." + param.id] = _this.notEval(spcaSpit_2.join(''));
                                         }
                                         catch (_a) {
                                             _this.calc();
                                         }
+                                        var res = _this.formulaSaver[_this.modelsKeys[element.modelId] + "." + element.id + "." + param.id] || 0;
                                         g_1.append("text")
                                             .attr("x", element.x + 20)
                                             .attr("y", py)
-                                            .text((param.name || param.id) + " - " + (parseFloat(_this.formulaSaver[_this.modelsKeys[element.modelId] + "." + element.id + "." + param.id] || "").toFixed(1)));
+                                            .text((param.name || param.id) + ": " +
+                                            ((parseFloat(res).toFixed(1))));
                                     }
                                     else {
                                         g_1.append("text")
                                             .attr("x", element.x + 20)
                                             .attr("y", py)
-                                            .text((param.name || param.id) + " - " + parseFloat(v || "").toFixed(1));
+                                            .text((param.name || param.id) + ": " + parseFloat(v || "").toFixed(1));
                                     }
                                     break;
                                 case "Input":
@@ -2168,60 +2531,72 @@ var ModelMainComponent = /** @class */ (function () {
                                     //   .attr("y", py)
                                     //   .text((param.name || param.id) + " - ");
                                     l = (param.name || param.id).length;
-                                    console.log(param);
                                     gR.append("foreignObject")
                                         .attr("x", element.x + ((param.name || param.id).length) + 5)
-                                        .attr("y", py - 10)
+                                        .attr("y", py - 5)
                                         .attr("width", 120)
-                                        .attr("height", 16)
+                                        .attr("height", 30)
                                         .attr("class", "foreignObject-input-bmp")
                                         .html(function (d) {
-                                        return "\n                      <div style=\"display:flex;align-items: center;\">\n                      <input id=\"" + index + "-" + paramIndex + "-left\" class=\"range-button\" type=\"button\" value=\"<\">\n                      </input>\n                      <input id=\"" + index + "-" + paramIndex + "\" type=\"range\"\n                      min=\"" + (+param.sliderMin - 1) + "\" max=\"" + (+param.sliderMax + 1) + "\"\n                      step=\"" + param.sliderStep + "\" value=\"" + param.value + "\" />\n                      <input id=\"" + index + "-" + paramIndex + "-right\" class=\"range-button\" type=\"button\" value=\">\">\n                      </input>\n                      </div>\n\n                      ";
+                                        return "\n                      <div id=\"" + index + "-" + paramIndex + "-slider\" class=\"cust-slider\">\n                      <div id=\"" + index + "-" + paramIndex + "-slider-value\" class=\"slider-value\">\n                      " + (param.name || param.id) + ": " + parseFloat(param.value || "").toFixed(1) + "\n                      </div>\n                      <div class=\"slider-wrap-outer\">\n                        <button id=\"" + index + "-" + paramIndex + "-left\" class=\"left\">\n                          <i class=\"material-icons\">\n                            keyboard_arrow_left\n                          </i>\n                        </button>\n                        <div id=\"" + index + "-" + paramIndex + "-slider-wrap\" class=\"slider-wrap\">\n                          <div id=\"" + index + "-" + paramIndex + "-sliderFillBg\" class=\"fill-bg\"></div>\n                          <div id=\"" + index + "-" + paramIndex + "-sliderIndecator\" class=\"indecator\" draggable=\"true\">\n                            <div class=\"bg-inside\"></div>\n                          </div>\n                        </div>\n                        <button id=\"" + index + "-" + paramIndex + "-right\" class=\"right\">\n                          <i class=\"material-icons\">\n                            keyboard_arrow_right\n                          </i>\n                        </button>\n                      </div>\n                    </div>\n                      ";
                                     });
-                                    gR.append("text")
-                                        .attr("font-size", "10px")
-                                        .attr("x", element.x + 50)
-                                        .attr("y", py - 6)
-                                        .text((param.name || param.id) + "-" + parseFloat(param.value || "").toFixed(1));
+                                    document.getElementById(index + "-" + paramIndex + "-sliderIndecator").addEventListener("dragstart", function (ev) {
+                                        console.log("sliderIndecator");
+                                    }, false);
                                     self_1 = _this;
-                                    var rangeElement_1 = document.getElementById(index + "-" + paramIndex);
-                                    rangeElement_1.onchange = function (e) {
-                                        setTimeout(function () {
-                                            _this.dragSelected = index;
-                                            _this.data[index].parameters[paramIndex].value = rangeElement_1.value.toString();
-                                            _this.txtQueryChanged.next({
-                                                value: rangeElement_1.value,
-                                                selected: _this.dragSelected
-                                            });
-                                        }, 150);
-                                    };
+                                    var rangeElement = document.getElementById(index + "-" + paramIndex);
+                                    self_1.sladerChange(param, paramIndex, index);
                                     var rangeElementleft = document.getElementById(index + "-" + paramIndex + "-left");
                                     rangeElementleft.onclick = function (e) {
-                                        setTimeout(function () {
-                                            var value = +rangeElement_1.value - +param.sliderStep;
+                                        if (!self_1.readOnly) {
+                                            var value = +param.value - +param.sliderStep;
                                             if (value >= param.sliderMin) {
                                                 self_1.dragSelected = index;
                                                 self_1.data[index].parameters[paramIndex].value = value.toString();
-                                                self_1.txtQueryChanged.next({
+                                                document.getElementById(index + "-" + paramIndex + "-slider-value").textContent
+                                                    = (param.name || param.id) + ": " + parseFloat(value.toString() || "").toFixed(1);
+                                                self_1.txtQueryChangedDebounce.next({
                                                     value: value,
                                                     selected: self_1.dragSelected
                                                 });
+                                                self_1.sladerChange(param, paramIndex, index);
                                             }
-                                        }, 20);
+                                        }
                                     };
                                     var rangeElementright = document.getElementById(index + "-" + paramIndex + "-right");
                                     rangeElementright.onclick = function (e) {
-                                        setTimeout(function () {
-                                            var value = +rangeElement_1.value + +param.sliderStep;
-                                            if (value <= param.sliderMax) {
+                                        if (!self_1.readOnly) {
+                                            var value = +param.value + +param.sliderStep;
+                                            if (value <= (param.sliderMax + 1)) {
                                                 self_1.dragSelected = index;
                                                 self_1.data[index].parameters[paramIndex].value = value.toString();
-                                                self_1.txtQueryChanged.next({
+                                                document.getElementById(index + "-" + paramIndex + "-slider-value").textContent
+                                                    = (param.name || param.id) + ": " + parseFloat(value.toString() || "").toFixed(1);
+                                                self_1.txtQueryChangedDebounce.next({
                                                     value: value,
                                                     selected: self_1.dragSelected
                                                 });
+                                                self_1.sladerChange(param, paramIndex, index);
                                             }
-                                        }, 20);
+                                        }
+                                    };
+                                    var sliderwrapElementright = document.getElementById(index + "-" + paramIndex + "-slider-wrap");
+                                    sliderwrapElementright.onclick = function (e) {
+                                        if (!self_1.readOnly) {
+                                            var value = ((e.offsetX / 90 * 100) * ((param.sliderMax - param.sliderMin) / 100)) + param.sliderMin;
+                                            value = Math.round(value / param.sliderStep) * param.sliderStep;
+                                            if (value <= (param.sliderMax + 1)) {
+                                                self_1.dragSelected = index;
+                                                self_1.data[index].parameters[paramIndex].value = value.toString();
+                                                document.getElementById(index + "-" + paramIndex + "-slider-value").textContent
+                                                    = (param.name || param.id) + ": " + parseFloat(value.toString() || "").toFixed(1);
+                                                self_1.txtQueryChangedDebounce.next({
+                                                    value: value,
+                                                    selected: self_1.dragSelected
+                                                });
+                                                self_1.sladerChange(param, paramIndex, index);
+                                            }
+                                        }
                                     };
                                     break;
                                 default:
@@ -2244,39 +2619,43 @@ var ModelMainComponent = /** @class */ (function () {
             function dragstarted(d) {
                 // d3.select(this)
                 //   .classed("active", true);
-                self.start_x = +d3.event.x;
-                self.start_y = +d3.event.y;
+                if (!self.readOnly) {
+                    self.start_x = +d3.event.x;
+                    self.start_y = +d3.event.y;
+                }
             }
             function dragged(d) {
-                var current_scale, current_scale_string;
-                var transform = document.getElementById('wrap');
-                if (transform.getAttribute("transform") === null) {
-                    current_scale = 1;
+                if (!self.readOnly) {
+                    var current_scale = void 0, current_scale_string = void 0;
+                    var transform = document.getElementById('wrap');
+                    if (transform.getAttribute("transform") === null) {
+                        current_scale = 1;
+                    }
+                    else {
+                        current_scale_string = transform.getAttribute("transform").split(" ")[1];
+                        current_scale = +current_scale_string.substring(6, current_scale_string.length - 1);
+                    }
+                    if (!self.zoomTrans) {
+                        self.zoomTrans = {
+                            x: 0,
+                            y: 0,
+                            k: 1,
+                        };
+                    }
+                    self.dragSelected = this.getAttribute("id").split("-")[0];
+                    self.data[self.dragSelected].x =
+                        (d3.event.x - self.zoomTrans.x) / self.zoomTrans.k;
+                    // self.start_x + (d3.event.x - self.start_x) / current_scale;
+                    // (e.offsetX - this.zoomTrans.x) / this.zoomTrans.k;
+                    var scale = 30;
+                    if (self.zoomTrans.k < 0.33) {
+                        scale = 50;
+                    }
+                    self.data[self.dragSelected].y = ((d3.event.y - self.zoomTrans.y) / self.zoomTrans.k - (scale / self.zoomTrans.k)) - 25;
+                    // self.start_y + (d3.event.y - self.start_y) / current_scale;
+                    self.removeAll();
+                    self.drow();
                 }
-                else {
-                    current_scale_string = transform.getAttribute("transform").split(" ")[1];
-                    current_scale = +current_scale_string.substring(6, current_scale_string.length - 1);
-                }
-                if (!self.zoomTrans) {
-                    self.zoomTrans = {
-                        x: 0,
-                        y: 0,
-                        k: 1,
-                    };
-                }
-                self.dragSelected = this.getAttribute("id").split("-")[0];
-                self.data[self.dragSelected].x =
-                    (d3.event.x - self.zoomTrans.x) / self.zoomTrans.k;
-                // self.start_x + (d3.event.x - self.start_x) / current_scale;
-                // (e.offsetX - this.zoomTrans.x) / this.zoomTrans.k;
-                var scale = 30;
-                if (self.zoomTrans.k < 0.33) {
-                    scale = 50;
-                }
-                self.data[self.dragSelected].y = ((d3.event.y - self.zoomTrans.y) / self.zoomTrans.k - (scale / self.zoomTrans.k)) - 25;
-                // self.start_y + (d3.event.y - self.start_y) / current_scale;
-                self.removeAll();
-                self.drow();
             }
             function dragended(d) {
                 d3.select(this).classed("active", false);
@@ -2287,6 +2666,15 @@ var ModelMainComponent = /** @class */ (function () {
                 });
             }
         });
+    };
+    ModelMainComponent.prototype.sladerChange = function (param, paramIndex, index) {
+        var otions = {
+            min: param.sliderMin,
+            max: param.sliderMax,
+            value: param.value
+        };
+        document.getElementById(index + "-" + paramIndex + "-sliderIndecator").style.left = "calc(" + ((otions.value - otions.min) / (otions.max - otions.min)) * 100 + "% - " + 15 * ((otions.value - otions.min) / (otions.max - otions.min)) + "px)";
+        document.getElementById(index + "-" + paramIndex + "-sliderFillBg").style.width = "calc(" + ((otions.value - otions.min) / (otions.max - otions.min)) * 100 + "% - " + 15 * ((otions.value - otions.min) / (otions.max - otions.min)) + "px)";
     };
     ModelMainComponent.prototype.formulaSearch = function (element) {
         var _this = this;
@@ -2304,22 +2692,26 @@ var ModelMainComponent = /** @class */ (function () {
     };
     ModelMainComponent.prototype.formulaDataSearch = function (data, arr, element) {
         var _this = this;
-        data.forEach(function (comp) {
-            comp.parameters.forEach(function (param) {
-                if (_this.modelsKeys[comp.modelId] === arr[0] && comp.id === arr[1] && param.id === arr[2]) {
-                    _this.formulaSaver[element] = +param.value;
-                }
+        new Promise(function (resolve, reject) {
+            data.forEach(function (comp) {
+                comp.parameters.forEach(function (param, i) {
+                    if (_this.modelsKeys[comp.modelId] === arr[0] && comp.id === arr[1] && param.id === arr[2]) {
+                        _this.formulaSaver[element] = +param.value;
+                    }
+                    if ((comp.parameters.length - 1) === i) {
+                        resolve();
+                    }
+                });
             });
-        });
-        setTimeout(function () {
+        }).then(function () {
             _this.clear();
-        }, 200);
+        });
     };
     ModelMainComponent.prototype.drowLines = function () {
         var _this = this;
         this.data.forEach(function (value, index, arr) {
             value.selected.forEach(function (item) {
-                var to = _this.searchById(item, _this.data);
+                var to = _this.searchById(item, _this.data, 'id');
                 var from = _this.data[index];
                 if (to) {
                     var x = +from.x;
@@ -2429,12 +2821,12 @@ var ModelMainComponent = /** @class */ (function () {
         else {
             var count_2 = 0;
             this.data[id].selected.forEach(function (element, index) {
-                if (_this.data[_this.activeArrow]._id === element) {
+                if (_this.data[_this.activeArrow].id === element) {
                     count_2++;
                 }
             });
             this.data[this.activeArrow].selected.forEach(function (element, index) {
-                if (_this.data[id]._id === element) {
+                if (_this.data[id].id === element) {
                     count_2++;
                 }
             });
@@ -2447,7 +2839,7 @@ var ModelMainComponent = /** @class */ (function () {
                 return;
             }
             if (id !== this.activeArrow) {
-                this.data[this.activeArrow].selected.push(this.data[id]._id);
+                this.data[this.activeArrow].selected.push(this.data[id].id);
                 this.txtQueryChanged.next({
                     value: "query",
                     selected: this.activeArrow
@@ -2473,9 +2865,10 @@ var ModelMainComponent = /** @class */ (function () {
         //   d3.selectAll(type).remove();
         // });
     };
-    ModelMainComponent.prototype.searchById = function (id, arr) {
+    ModelMainComponent.prototype.searchById = function (id, arr, idField) {
         if (arr) {
-            var result = arr.find(function (element) { return element._id === id; });
+            var f_1 = idField || "_id";
+            var result = arr.find(function (element) { return element[f_1] === id; });
             return result;
         }
     };
@@ -2533,6 +2926,351 @@ var ModelMainComponent = /** @class */ (function () {
             this.clickArrow = false;
         }
     };
+    ModelMainComponent.prototype.sliderChange = function (e, item, i) {
+        if (item.controlType === "Slider") {
+            if (+item.value < item.sliderMin) {
+                item.value = item.sliderMin.toString();
+                this.txtQueryChanged.next({
+                    value: item.value,
+                    selected: i
+                });
+            }
+            else if (+item.value > item.sliderMax) {
+                item.value = item.sliderMax.toString();
+                this.txtQueryChanged.next({
+                    value: item.value,
+                    selected: i
+                });
+            }
+        }
+    };
+    ModelMainComponent.prototype.idModelChange = function (e) {
+        var _this = this;
+        var data = this.returnCopyData();
+        var res = data.find(function (el) {
+            return el.id === _this.data[_this.selectedModal].id;
+        });
+        if (!res) {
+            this.canChangeId = true;
+        }
+        console.log(data, this.data[this.selectedModal].id, this.canChangeId, res);
+    };
+    ModelMainComponent.prototype.returnCopyData = function () {
+        var data;
+        if (this.saverComponent) {
+            var arr = this.saverComponent[this.saverComponent.length - 2];
+            if (arr && this.saverComponent.length > 1) {
+                data = JSON.parse(JSON.stringify(arr));
+            }
+            else {
+                data = this.dataCopy;
+            }
+        }
+        else {
+            data = this.dataCopy;
+        }
+        return data;
+    };
+    ModelMainComponent.prototype.onFieldChangeId = function (query) {
+        var _this = this;
+        var data = this.returnCopyData();
+        var id = document.getElementById("dataId").value;
+        if (this.canChangeId) {
+            this.data.forEach(function (d) {
+                d.parameters.forEach(function (p) {
+                    console.log(p.value, data[_this.selectedModal].id, id);
+                    var re = new RegExp(data[_this.selectedModal].id, 'g');
+                    p.value = p.value.replace(re, id);
+                    console.log(p.value, data[_this.selectedModal].id, id);
+                });
+                console.log(d);
+                _this.componentService.update(d).subscribe(function (r) {
+                });
+            });
+            this.saverComponent.push(JSON.parse(JSON.stringify(this.data)));
+        }
+        else {
+            this.data[this.selectedModal].id = data[this.selectedModal].id;
+        }
+        this.txtQueryChanged.next({
+            value: id,
+            selected: this.selectedModal
+        });
+    };
+    ModelMainComponent.prototype.validValue = function (item, i) {
+        if (item.controlType === "Slider") {
+            if (+item.value < item.sliderMin) {
+                item.value = item.sliderMin.toString();
+                this.txtQueryChanged.next({
+                    value: item.value,
+                    selected: i
+                });
+            }
+            else if (+item.value > item.sliderMax) {
+                item.value = item.sliderMax.toString();
+                this.txtQueryChanged.next({
+                    value: item.value,
+                    selected: i
+                });
+            }
+        }
+    };
+    ModelMainComponent.prototype.generateCSVPatern = function () {
+        var _this = this;
+        var items = [
+            ['Obgect ID'],
+            ['Obgect name'],
+            ['Parameter ID'],
+            ['Parameter name'],
+            ["Timestamp\\Mesured"]
+        ];
+        for (var _i = 0, _a = this.data; _i < _a.length; _i++) {
+            var item = _a[_i];
+            var _loop_1 = function (param) {
+                if (param.measurable) {
+                    items[0].push(item.id);
+                    console.log(item);
+                    items[1].push(item.name);
+                    items[2].push(param.id);
+                    items[3].push(param.name);
+                    var v = param.value;
+                    console.log(items);
+                    if (v && v.charAt(0) === "=") {
+                        var spcaSpit_3 = v.split(" ");
+                        spcaSpit_3.forEach(function (element, index) {
+                            var earr = element.split(".");
+                            if (earr.length == 3) {
+                                spcaSpit_3[index] = _this.formulaSaver[element];
+                            }
+                        });
+                        spcaSpit_3.shift();
+                        try {
+                            items[4].push(parseFloat(this_1.notEval(spcaSpit_3.join('')).toFixed(1)).toString());
+                        }
+                        catch (_a) {
+                            items[4].push("0");
+                        }
+                    }
+                    else {
+                        items[4].push(param.value);
+                    }
+                }
+            };
+            var this_1 = this;
+            for (var _b = 0, _c = item.parameters; _b < _c.length; _b++) {
+                var param = _c[_b];
+                _loop_1(param);
+            }
+        }
+        console.log(items, (items.map(function (e) { return e.join(";"); }).join("\n")));
+        var csvContent = "data:text/csv;charset=utf-8,"
+            // + windows1251.decode(items.map(e => e.join(";")).join("\n"));
+            + (items.map(function (e) { return e.join(";"); }).join("\n"));
+        var encodedUri = encodeURI(csvContent);
+        var link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "my_data.csv");
+        document.body.appendChild(link); // Required for FF
+        link.click();
+    };
+    ModelMainComponent.prototype.generateCSVFull = function () {
+        var items = [];
+        for (var i = 0; i < this.dataPlayer.length; i++) {
+            for (var j = 0; j < this.dataPlayer[i].length; j++) {
+                if (!items[j] && this.dataPlayer[i][j]) {
+                    items[j] = [];
+                }
+                if (items[j])
+                    items[j].push(this.dataPlayer[i][j]);
+            }
+        }
+        console.log(items, (items.map(function (e) { return e.join(";"); }).join("\n")));
+        var csvContent = "data:text/csv;charset=utf-8,"
+            + (items.map(function (e) { return e.join(";"); }).join("\n"));
+        var encodedUri = encodeURI(csvContent);
+        var link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "my_data.csv");
+        document.body.appendChild(link); // Required for FF
+        link.click();
+    };
+    ModelMainComponent.prototype.ConvertToCSV = function (objArray) {
+        var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
+        var str = '';
+        for (var i = 0; i < array.length; i++) {
+            var line = '';
+            for (var index in array[i]) {
+                if (line != '')
+                    line += ';';
+                line += array[i][index];
+            }
+            str += line + '\r\n';
+        }
+        return str;
+    };
+    ModelMainComponent.prototype.onChange = function (event) {
+        var file = event.srcElement.files[0];
+        if (file) {
+            var reader = new FileReader();
+            var self_2 = this;
+            reader.readAsText(file, "UTF-8");
+            reader.onload = function (evt) {
+                console.log(evt.target.result);
+                self_2.setDataPlayer(self_2.csvJSON(evt.target.result));
+                self_2.playerService.dataEmitter.emit(self_2.dataPlayer);
+                self_2.readOnly = true;
+            };
+            reader.onerror = function (evt) {
+                console.log('error reading file');
+            };
+        }
+    };
+    ModelMainComponent.prototype.setDataPlayer = function (data) {
+        var _this = this;
+        if (data === null) {
+            data = this.dataPlayerData;
+        }
+        else {
+            this.dataPlayerData = data;
+        }
+        var newArr = [];
+        // this.dataPlayer = data;
+        for (var j = 4; j < data[1].length; j++) {
+            for (var i = 1; i < data.length; i++) {
+                for (var _i = 0, _a = this.data; _i < _a.length; _i++) {
+                    var item = _a[_i];
+                    if (item && item.id && item.id.toLowerCase().trim() === data[i][0].toLowerCase().trim()) {
+                        for (var _b = 0, _c = item.parameters; _b < _c.length; _b++) {
+                            var param = _c[_b];
+                            if (param.id.toLowerCase().trim() === data[i][2].toLowerCase().trim()) {
+                                param.value = data[i][j];
+                                this.formulaSaver[this.modelID + "." + item.id + "." + param.id] = data[i][j];
+                            }
+                        }
+                    }
+                }
+                if (data.length - 1 === i) {
+                    for (var _d = 0, _e = this.data; _d < _e.length; _d++) {
+                        var item = _e[_d];
+                        var _loop_2 = function (param) {
+                            var v = param.value;
+                            if (v && v.charAt(0) === "=") {
+                                var spcaSpit_4 = v.split(" ");
+                                spcaSpit_4.forEach(function (element, index) {
+                                    var earr = element.split(".");
+                                    if (earr.length == 3) {
+                                        spcaSpit_4[index] = _this.formulaSaver[element];
+                                    }
+                                });
+                                spcaSpit_4.shift();
+                                try {
+                                    var flag = void 0;
+                                    var res = this_2.notEval(spcaSpit_4.join(''));
+                                    for (var i_1 = 0; i_1 < newArr.length; i_1++) {
+                                        if (item.id === newArr[i_1][0] && param.id === newArr[i_1][2]) {
+                                            flag = true;
+                                            newArr[i_1][j] = res.toString();
+                                        }
+                                    }
+                                    if (!flag) {
+                                        newArr.push([]);
+                                        newArr[newArr.length - 1].push(item.id);
+                                        newArr[newArr.length - 1].push(item.name);
+                                        newArr[newArr.length - 1].push(param.id);
+                                        newArr[newArr.length - 1].push(param.name);
+                                        newArr[newArr.length - 1].push(res.toString());
+                                    }
+                                }
+                                catch (_a) {
+                                }
+                            }
+                        };
+                        var this_2 = this;
+                        for (var _f = 0, _g = item.parameters; _f < _g.length; _f++) {
+                            var param = _g[_f];
+                            _loop_2(param);
+                        }
+                    }
+                }
+            }
+        }
+        this.dataPlayer = data.concat(newArr);
+        console.log(this.dataPlayer);
+        if (data !== null) {
+            this.getData();
+            this.formulaSaver = {};
+            this.calc();
+        }
+    };
+    ModelMainComponent.prototype.csvJSON = function (csv) {
+        var lines = csv.split("\n");
+        var result = [];
+        // NOTE: If your columns contain commas in their values, you'll need
+        // to deal with those before doing the next step
+        // (you might convert them to &&& or something, then covert them back later)
+        // jsfiddle showing the issue https://jsfiddle.net/
+        var headers = lines[0].split(",");
+        for (var i = 0; i < lines.length; i++) {
+            var obj = {};
+            var currentline = lines[i].split(";");
+            for (var j = 0; j < currentline.length; j++) {
+                if (!result[j]) {
+                    result[j] = [];
+                }
+                result[j].push(currentline[j]);
+            }
+            // for(var j=0;j<headers.length;j++){
+            //     obj[headers[j]] = currentline[j];
+            // }
+            // result.push(obj);
+        }
+        return result; //JavaScript object
+        // return JSON.stringify(result); //JSON
+    };
+    ModelMainComponent.prototype.switchPlayer = function () {
+        var _this = this;
+        if (this.dataPlayer.length) {
+            this.readOnly = !this.readOnly;
+            this.playerService.closePlayer.emit(this.readOnly);
+            if (!this.readOnly) {
+                for (var i = 0; i < this.data.length; i++) {
+                    var copyObj = this.returnCopyData();
+                    for (var j = 0; j < copyObj[i].parameters.length; j++) {
+                        var p = copyObj[i].parameters[j];
+                        if (p.value && p.value.charAt(0) === "=") {
+                            this.data[i].parameters[j].value = p.value;
+                        }
+                    }
+                    this.componentService.update(this.data[i]).subscribe(function (r) {
+                        _this.componentService.getAllByUserId(_this.user._id).subscribe(function (data) {
+                            _this.formulaData = data;
+                            _this.formulaSaver = {};
+                            new Promise(function (resolve, reject) { _this.calc(resolve, reject); }).then(function () {
+                                _this.removeAll();
+                                _this.drow();
+                            });
+                        });
+                    });
+                }
+                setTimeout(function () {
+                    _this.formulaSaver = {};
+                    _this.dataPlayer = [];
+                    _this.getData();
+                }, 8000);
+                setTimeout(function () {
+                    _this.setDataPlayer(null);
+                }, 15000);
+            }
+            console.log(this.formulaSaver);
+            this.calc();
+        }
+    };
+    __decorate([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["HostListener"])('window:keydown', ['$event']),
+        __metadata("design:type", Function),
+        __metadata("design:paramtypes", [KeyboardEvent]),
+        __metadata("design:returntype", void 0)
+    ], ModelMainComponent.prototype, "onKeyPress", null);
     __decorate([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["HostListener"])("document:keyup", ["$event"]),
         __metadata("design:type", Function),
@@ -2548,8 +3286,10 @@ var ModelMainComponent = /** @class */ (function () {
         __metadata("design:paramtypes", [_shared_model_service__WEBPACK_IMPORTED_MODULE_1__["ModelService"],
             _shared_component_service__WEBPACK_IMPORTED_MODULE_2__["ComponentService"],
             _angular_material_dialog__WEBPACK_IMPORTED_MODULE_3__["MatDialog"],
-            _auth_auth_service__WEBPACK_IMPORTED_MODULE_8__["AuthService"],
-            _angular_router__WEBPACK_IMPORTED_MODULE_6__["ActivatedRoute"]])
+            _auth_auth_service__WEBPACK_IMPORTED_MODULE_9__["AuthService"],
+            _angular_router__WEBPACK_IMPORTED_MODULE_6__["ActivatedRoute"],
+            _angular_common_http__WEBPACK_IMPORTED_MODULE_11__["HttpClient"],
+            _shared_components_player_player_service__WEBPACK_IMPORTED_MODULE_12__["PlayerService"]])
     ], ModelMainComponent);
     return ModelMainComponent;
 }());
@@ -2624,7 +3364,7 @@ var ComponentService = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<h1 mat-dialog-title>{{label}}</h1>\r\n<div *ngIf=\"!deleteMode\" mat-dialog-content>\r\n  <mat-form-field>\r\n    <mat-label>ID</mat-label>\r\n    <input matInput (keydown)=\"onKeyDown($event)\" (ngModelChange)=\"validChange($event)\" [(ngModel)]=\"model.id\" />\r\n  </mat-form-field>\r\n  <mat-form-field>\r\n    <mat-label>Name</mat-label>\r\n    <input matInput [(ngModel)]=\"model.name\" />\r\n  </mat-form-field>\r\n  <mat-form-field>\r\n    <mat-label>Description</mat-label>\r\n    <input matInput [(ngModel)]=\"model.description\" />\r\n  </mat-form-field>\r\n</div>\r\n<div mat-dialog-actions class=\"jc-c df\">\r\n  <button\r\n    mat-button\r\n    [disabled]=\"!valid && !deleteMode\"\r\n    [mat-dialog-close]=\"model\"\r\n    mat-raised-button\r\n    color=\"primary\"\r\n    cdkFocusInitial\r\n  >\r\n    Ok\r\n  </button>\r\n  <button mat-button (click)=\"onNoClick()\">Cancel</button>\r\n</div>\r\n"
+module.exports = "<h1 mat-dialog-title>{{label}}</h1>\n<div *ngIf=\"!deleteMode\" mat-dialog-content>\n  <mat-form-field>\n    <mat-label>ID</mat-label>\n    <input matInput (keydown)=\"onKeyDown($event)\" (ngModelChange)=\"validChange($event)\" [(ngModel)]=\"model.id\" />\n  </mat-form-field>\n  <mat-form-field>\n    <mat-label>Name</mat-label>\n    <input matInput [(ngModel)]=\"model.name\" />\n  </mat-form-field>\n  <mat-form-field>\n    <mat-label>Description</mat-label>\n    <input matInput [(ngModel)]=\"model.description\" />\n  </mat-form-field>\n</div>\n<div mat-dialog-actions class=\"jc-c df\">\n  <button\n    mat-button\n    [disabled]=\"!valid && !deleteMode\"\n    [mat-dialog-close]=\"model\"\n    mat-raised-button\n    color=\"primary\"\n    cdkFocusInitial\n  >\n    Ok\n  </button>\n  <button mat-button (click)=\"onNoClick()\">Cancel</button>\n</div>\n"
 
 /***/ }),
 
@@ -2735,7 +3475,7 @@ var DialogCreateModelComponent = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<h1 mat-dialog-title>Formula dialog</h1>\r\n<div mat-dialog-content>\r\n  <mat-form-field>\r\n    <mat-label>Model</mat-label>\r\n    <mat-select [(ngModel)]=\"sleectedModel\" (ngModelChange)=\"modelChange($event)\">\r\n      <mat-option *ngFor=\"let item of listModel\" [value]=\"item._id\">\r\n        {{item.name}}\r\n      </mat-option>\r\n    </mat-select>\r\n  </mat-form-field>\r\n  <mat-form-field>\r\n    <mat-label>Class</mat-label>\r\n    <mat-select [(ngModel)]=\"selectedClass\" (ngModelChange)=\"paramsFilter($event)\">\r\n      <mat-option *ngFor=\"let item of listClass\" [value]=\"item\">\r\n        {{item}}\r\n      </mat-option>\r\n    </mat-select>\r\n  </mat-form-field>\r\n  <mat-form-field>\r\n    <mat-label>Object</mat-label>\r\n    <mat-select [(ngModel)]=\"selectedObject\" (ngModelChange)=\"paramsFilter($event)\">\r\n      <mat-option *ngFor=\"let item of listObjects | filtrListParam: selectedClass\" [value]=\"item.id\">\r\n        {{item.name || item.id}}\r\n      </mat-option>\r\n    </mat-select>\r\n  </mat-form-field>\r\n  <mat-form-field>\r\n    <mat-label>Parameter</mat-label>\r\n    <mat-select [(ngModel)]=\"selectedParam\" (ngModelChange)=\"paramsChange($event)\">\r\n      <mat-option *ngFor=\"let item of listParams | filtrListParam: selectedClass: selectedObject\" [value]=\"item._id\">\r\n        {{item.name || item.id}}\r\n      </mat-option>\r\n    </mat-select>\r\n  </mat-form-field>\r\n  <div style=\"width: 40%; padding: 20px 0 0 20px;\">\r\n    <div class=\"full-width\">\r\n      <!-- [disabled]=\"!boolLastOperator\" -->\r\n      <!-- [matTooltip]=\"!boolLastOperator ? 'Before add math operator: +, -, *, /' : null\"? -->\r\n      <button\r\n       (click)=\"add()\" class=\"full-width\" mat-raised-button color=\"primary\" mat-button>\r\n        <= ADD</button> </div>\r\n          <!-- <button (click)=\"test()\" class=\"func\" mat-raised-button color=\"primary\" mat-button>\r\n            <i>\r\n              f(x)\r\n            </i>\r\n          </button> -->\r\n  </div>\r\n  <div class=\"textarea-wrap\">\r\n    <div class=\"formula-wrap-outer\">\r\n      <div (click)=\"formulaWrapClick();textArea.focus()\" class=\"formula-wrap\">\r\n        <div class=\"formula-item-wrap\" *ngFor=\"let item of formulaArr;let i = index\">\r\n            <div *ngIf=\"(item !== '|') && (i === 0 || (formulaArr[i - 1] && formulaArr[i - 1] !== '|'))\" \r\n            (click)=\"formulaItemClick(item, i)\" class=\"formula-item-space\"\r\n             ></div>\r\n            <div (click)=\"formulaItemClick(item, i + 1)\" class=\"formula-item\" [ngClass]=\"{'blink blink-item': item === '|'}\">\r\n              {{item}}\r\n            </div>\r\n            <div *ngIf=\"(i === (formulaArr.length - 1)) && item !== '|'\" (click)=\"formulaItemClick(item, i+1)\" class=\"formula-item-space\"></div>\r\n        </div>\r\n      </div>\r\n      <!-- formula-text -->\r\n      <mat-form-field style=\"width: 100%;position: absolute;top: 0; z-index: -1;\" class=\" example-full-width\">\r\n        <!-- (ngModelChange)=\"change($event)\" -->\r\n        <!-- [(ngModel)]=\"formula\" (ngModelChange)=\"change($event)\" (keydown)=\"checkPattern($event)\" -->\r\n        <textarea #textArea matInput [(ngModel)]=\"formulaData\" \r\n        (ngModelChange)=\"changeForumula($event)\" (keydown)=\"keyFormula($event)\"></textarea>\r\n          \r\n      </mat-form-field>\r\n      <!-- <div (click)=\"textArea.focus()\" class=\"text-area-shield\"></div> -->\r\n    </div>\r\n\r\n  </div>\r\n</div>\r\n<div mat-dialog-actions class=\"jc-c df\">\r\n  <button mat-button (click)=\"ok()\" mat-raised-button color=\"primary\" cdkFocusInitial>\r\n    Ok\r\n  </button>\r\n  <button mat-button (click)=\"onNoClick()\">Cancel</button>\r\n</div>"
+module.exports = "<h1 mat-dialog-title>Formula dialog</h1>\n<div id=\"wrap-dialog-scroll\" mat-dialog-content>\n  <mat-form-field>\n    <mat-label>Model</mat-label>\n    <mat-select [(ngModel)]=\"sleectedModel\" (ngModelChange)=\"modelChange($event)\">\n      <mat-option *ngFor=\"let item of listModel\" [value]=\"item._id\">\n        {{item.name}}\n      </mat-option>\n    </mat-select>\n  </mat-form-field>\n  <mat-form-field>\n    <mat-label>Class</mat-label>\n    <mat-select [(ngModel)]=\"selectedClass\" (ngModelChange)=\"paramsFilter($event)\">\n      <mat-option *ngFor=\"let item of listClass\" [value]=\"item\">\n        {{item}}\n      </mat-option>\n    </mat-select>\n  </mat-form-field>\n  <mat-form-field>\n    <mat-label>Object</mat-label>\n    <mat-select [(ngModel)]=\"selectedObject\" (ngModelChange)=\"selectedObjectChange($event)\">\n      <mat-option *ngFor=\"let item of listObjects | filtrListParam: selectedClass\" [value]=\"item.id\">\n        {{item.name || item.id}}\n      </mat-option>\n    </mat-select>\n  </mat-form-field>\n  <mat-form-field>\n    <mat-label>Parameter</mat-label>\n    <mat-select [(ngModel)]=\"selectedParam\" (ngModelChange)=\"paramsChange($event)\">\n      <mat-option *ngFor=\"let item of listParams | filtrListParam: selectedClass: selectedObject\" [value]=\"item._id\">\n        {{item.name || item.id}}\n      </mat-option>\n    </mat-select>\n  </mat-form-field>\n  <div style=\"width: 40%; padding: 20px 0 0 20px;\">\n    <div class=\"full-width\">\n      <!-- [disabled]=\"!boolLastOperator\" -->\n      <!-- [matTooltip]=\"!boolLastOperator ? 'Before add math operator: +, -, *, /' : null\"? -->\n      <button\n       (click)=\"add()\" class=\"full-width\" mat-raised-button color=\"primary\" mat-button>\n        <= ADD</button> </div>\n          <!-- <button (click)=\"test()\" class=\"func\" mat-raised-button color=\"primary\" mat-button>\n            <i>\n              f(x)\n            </i>\n          </button> -->\n  </div>\n  <div class=\"textarea-wrap\">\n    <div class=\"formula-wrap-outer\">\n      <div (click)=\"formulaWrapClick();textArea.focus()\" class=\"formula-wrap\">\n        <div class=\"formula-item-wrap\" *ngFor=\"let item of formulaArr;let i = index\">\n            <div *ngIf=\"(item !== '|') && (i === 0 || (formulaArr[i - 1] && formulaArr[i - 1] !== '|'))\" \n            (click)=\"formulaItemClick(item, i)\" class=\"formula-item-space\"\n             ></div>\n            <div (click)=\"formulaItemClick(item, i + 1)\" class=\"formula-item\" [ngClass]=\"{'blink blink-item': item === '|'}\">\n              {{item}}\n            </div>\n            <div *ngIf=\"(i === (formulaArr.length - 1)) && item !== '|'\" (click)=\"formulaItemClick(item, i+1)\" class=\"formula-item-space\"></div>\n        </div>\n      </div>\n      <!-- formula-text -->\n      <mat-form-field style=\"width: 100%;position: absolute;top: 0; z-index: -1;\" class=\" example-full-width\">\n        <!-- (ngModelChange)=\"change($event)\" -->\n        <!-- [(ngModel)]=\"formula\" (ngModelChange)=\"change($event)\" (keydown)=\"checkPattern($event)\" -->\n        <textarea #textArea matInput [(ngModel)]=\"formulaData\" \n        (ngModelChange)=\"changeForumula($event)\" (keydown)=\"keyFormula($event)\"></textarea>\n          \n      </mat-form-field>\n      <!-- <div (click)=\"textArea.focus()\" class=\"text-area-shield\"></div> -->\n    </div>\n\n  </div>\n</div>\n<div mat-dialog-actions class=\"jc-c df\">\n  <button mat-button (click)=\"ok()\" mat-raised-button color=\"primary\" cdkFocusInitial>\n    Ok\n  </button>\n  <button mat-button (click)=\"onNoClick()\">Cancel</button>\n</div>"
 
 /***/ }),
 
@@ -2824,6 +3564,7 @@ var DialogParametersComponent = /** @class */ (function () {
                 _this.formulaArr.splice(_this.formulaIndex, 0, "|");
             }
             _this.textArea.nativeElement.focus();
+            document.getElementById("wrap-dialog-scroll").scrollTo(0, 0);
             _this.chRef.detectChanges();
         }, 500);
     };
@@ -2876,6 +3617,9 @@ var DialogParametersComponent = /** @class */ (function () {
     };
     DialogParametersComponent.prototype.modelChange = function (id) {
         var _this = this;
+        this.selectedClass = null;
+        this.selectedObject = null;
+        this.selectedParam = null;
         this.componentService.getAllById(id).subscribe(function (data) {
             _this.listComponents = data;
             _this.listClass = [];
@@ -2900,6 +3644,11 @@ var DialogParametersComponent = /** @class */ (function () {
         return self.indexOf(value) === index;
     };
     DialogParametersComponent.prototype.paramsFilter = function (e) {
+        this.selectedObject = null;
+        this.selectedParam = null;
+    };
+    DialogParametersComponent.prototype.selectedObjectChange = function () {
+        this.selectedParam = null;
     };
     DialogParametersComponent.prototype.ok = function () {
         this.removeSpace();
@@ -2953,6 +3702,9 @@ var DialogParametersComponent = /** @class */ (function () {
         //   this.formula += this.selectedFormulaVar;
         // }
         this.formulaArr.splice(this.formulaIndex, 0, this.selectedFormulaVar);
+        this.formulaIndex += 1;
+        this.formulaItemClick({}, this.formulaIndex);
+        this.textArea.nativeElement.focus();
     };
     DialogParametersComponent.prototype.searchById = function (id, arr) {
         if (arr) {
@@ -3132,6 +3884,157 @@ var DialogParametersComponent = /** @class */ (function () {
             _component_service__WEBPACK_IMPORTED_MODULE_3__["ComponentService"], _angular_core__WEBPACK_IMPORTED_MODULE_0__["ChangeDetectorRef"], Object])
     ], DialogParametersComponent);
     return DialogParametersComponent;
+}());
+
+
+
+/***/ }),
+
+/***/ "./src/app/shared/components/player/player.component.html":
+/*!****************************************************************!*\
+  !*** ./src/app/shared/components/player/player.component.html ***!
+  \****************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = "<div *ngIf=\"data && data[0] && data[0][cursor] && !hidde\" class=\"player-wrap\">\n  <div class=\"actions-buttons\">\n    <button \n      mat-icon-button \n      matTooltip=\"Info about the action Info about the action Info about the action Info about the action Info about the action Info about the action Info about the action Info about the action Info about the action Info about the action Info about the action Info about the action Info about the action \" \n      matTooltipPosition=\"below\"\n      (click)=\"cursor = 4\"\n    >\n      <i class=\"material-icons\">\n        skip_previous\n      </i>\n    </button>\n    <button (click)=\"pause()\" mat-icon-button>\n      <i class=\"material-icons\">\n        pause\n      </i>\n    </button>\n    <button (click)=\"play()\" mat-icon-button>\n      <i class=\"material-icons\">\n        play_arrow\n      </i>\n    </button>\n    <button (click)=\"cursor = data[0].length - 2\" mat-icon-button>\n      <i class=\"material-icons\">\n        skip_next\n      </i>\n    </button>\n  </div>\n  <div>\n    <div class=\"labeles\">\n      <div class=\"box time\">\n        Time Stamp\n      </div>\n      <div class=\"box date\">\n        {{data[0][cursor]}}\n      </div>\n      <button mat-icon-button>\n        <img width=\"30px\" src=\"assets/icons/png/chart-down.png\" alt=\"\">\n      </button>\n      <button mat-icon-button>\n        <img width=\"30px\" src=\"assets/icons/png/chart-up.png\" alt=\"\">\n      </button>\n      <!-- <div style=\"font-size: 14px;\" (click)=\"close()\">X</div> -->\n    </div>\n    <div class=\"field\">\n      <button (click)=\"skipPrevious()\" mat-icon-button style=\"margin-right: -18px;\">\n        <i class=\"material-icons\" style=\"font-size: 38px;\">\n          arrow_left\n        </i>\n      </button>\n      <div class=\"slider-wrap\">\n        <input [(ngModel)]=\"cursor\" type=\"range\" min=\"4\" [max]=\"data[0].length - 2\" (ngModelChange)=\"cursorChange($event)\">\n      </div>\n      <button (click)=\"skipNext()\" mat-icon-button style=\"margin-left: -18px;\">\n        <i class=\"material-icons\" style=\"font-size: 38px;\">\n          arrow_right\n        </i>\n      </button>\n    </div>\n  </div>\n</div>"
+
+/***/ }),
+
+/***/ "./src/app/shared/components/player/player.component.scss":
+/*!****************************************************************!*\
+  !*** ./src/app/shared/components/player/player.component.scss ***!
+  \****************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = ".player-wrap {\n  color: black;\n  display: flex;\n  align-items: flex-end; }\n  .player-wrap .actions-buttons {\n    display: flex;\n    align-items: center; }\n  .player-wrap .actions-buttons .material-icons {\n      font-size: 32px; }\n  .player-wrap .field {\n    display: flex;\n    align-items: center; }\n  .player-wrap .labeles {\n    display: flex;\n    align-items: center; }\n  .player-wrap .labeles .box {\n      font-size: 12px;\n      padding: 4px;\n      border: 1px solid #673ab7;\n      border-radius: 6px;\n      margin-right: 10px;\n      height: 30px;\n      display: flex;\n      align-items: center;\n      justify-content: center; }\n  .player-wrap .labeles .box.time {\n        width: 30%;\n        margin-left: 13px; }\n  .player-wrap .labeles .box.date {\n        width: calc(70% - 125px); }\n  .slider-wrap {\n  width: 400px;\n  position: relative;\n  display: flex; }\n  input {\n  -webkit-appearance: none;\n  border-radius: 21px;\n  background-color: #000000;\n  outline: none;\n  width: calc(100% + 4px);\n  border: none;\n  height: 4px;\n  margin: 0; }\n  input::-webkit-slider-thumb {\n  -webkit-appearance: none;\n  appearance: none;\n  width: 6px;\n  height: 20px;\n  border-right: 2px solid black;\n  border-left: 2px solid black;\n  z-index: 11;\n  position: relative;\n  cursor: pointer; }\n  input::-moz-range-thumb {\n  -webkit-appearance: none;\n  -moz-appearance: none;\n       appearance: none;\n  width: 12px;\n  height: 12px;\n  border-right: 2px solid black;\n  border-left: 2px solid black;\n  z-index: 11;\n  position: relative;\n  cursor: pointer; }\n"
+
+/***/ }),
+
+/***/ "./src/app/shared/components/player/player.component.ts":
+/*!**************************************************************!*\
+  !*** ./src/app/shared/components/player/player.component.ts ***!
+  \**************************************************************/
+/*! exports provided: PlayerComponent */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PlayerComponent", function() { return PlayerComponent; });
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
+/* harmony import */ var _player_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./player.service */ "./src/app/shared/components/player/player.service.ts");
+var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (undefined && undefined.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+var PlayerComponent = /** @class */ (function () {
+    function PlayerComponent(playerService) {
+        var _this = this;
+        this.playerService = playerService;
+        this.data = [];
+        this.cursor = 4;
+        playerService.dataEmitter.subscribe(function (data) {
+            console.log(data);
+            _this.data = data;
+        });
+        this.playerService.closePlayer.subscribe(function (data) {
+            _this.hidde = !data;
+        });
+    }
+    PlayerComponent.prototype.ngOnInit = function () {
+    };
+    PlayerComponent.prototype.pause = function () {
+        clearInterval(this.interval);
+    };
+    PlayerComponent.prototype.play = function () {
+        var _this = this;
+        this.interval = setInterval(function () {
+            if (_this.cursor < _this.data[0].length - 2)
+                _this.cursor++;
+            else {
+                _this.cursor = 4;
+                _this.pause();
+            }
+            _this.playerService.cursorEmitter.emit(_this.cursor);
+        }, 1000);
+    };
+    PlayerComponent.prototype.skipPrevious = function () {
+        if (this.cursor > 4) {
+            this.cursor--;
+            this.playerService.cursorEmitter.emit(this.cursor);
+        }
+    };
+    PlayerComponent.prototype.skipNext = function () {
+        if (this.cursor < this.data[0].length - 2) {
+            this.cursor++;
+            this.playerService.cursorEmitter.emit(this.cursor);
+        }
+    };
+    PlayerComponent.prototype.cursorChange = function (e) {
+        this.playerService.cursorEmitter.emit(e);
+    };
+    PlayerComponent.prototype.close = function () {
+        this.data = [];
+        this.playerService.closePlayer.emit("");
+    };
+    PlayerComponent = __decorate([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"])({
+            selector: 'app-player',
+            template: __webpack_require__(/*! ./player.component.html */ "./src/app/shared/components/player/player.component.html"),
+            styles: [__webpack_require__(/*! ./player.component.scss */ "./src/app/shared/components/player/player.component.scss")]
+        }),
+        __metadata("design:paramtypes", [_player_service__WEBPACK_IMPORTED_MODULE_1__["PlayerService"]])
+    ], PlayerComponent);
+    return PlayerComponent;
+}());
+
+
+
+/***/ }),
+
+/***/ "./src/app/shared/components/player/player.service.ts":
+/*!************************************************************!*\
+  !*** ./src/app/shared/components/player/player.service.ts ***!
+  \************************************************************/
+/*! exports provided: PlayerService */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PlayerService", function() { return PlayerService; });
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
+/* harmony import */ var _angular_common_http__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/common/http */ "./node_modules/@angular/common/fesm5/http.js");
+var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (undefined && undefined.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+var PlayerService = /** @class */ (function () {
+    function PlayerService(http) {
+        this.http = http;
+        this.dataEmitter = new _angular_core__WEBPACK_IMPORTED_MODULE_0__["EventEmitter"]();
+        this.cursorEmitter = new _angular_core__WEBPACK_IMPORTED_MODULE_0__["EventEmitter"]();
+        this.closePlayer = new _angular_core__WEBPACK_IMPORTED_MODULE_0__["EventEmitter"]();
+    }
+    PlayerService = __decorate([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Injectable"])(),
+        __metadata("design:paramtypes", [_angular_common_http__WEBPACK_IMPORTED_MODULE_1__["HttpClient"]])
+    ], PlayerService);
+    return PlayerService;
 }());
 
 
@@ -3390,12 +4293,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_dialog_create_model_dialog_create_model_component__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./components/dialog-create-model/dialog-create-model.component */ "./src/app/shared/components/dialog-create-model/dialog-create-model.component.ts");
 /* harmony import */ var _pipes_filtr_list_param_pipe__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./pipes/filtr-list-param.pipe */ "./src/app/shared/pipes/filtr-list-param.pipe.ts");
 /* harmony import */ var _directives_click_outside_directive__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./directives/click-outside.directive */ "./src/app/shared/directives/click-outside.directive.ts");
+/* harmony import */ var _components_player_player_component__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./components/player/player.component */ "./src/app/shared/components/player/player.component.ts");
+/* harmony import */ var _components_player_player_service__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./components/player/player.service */ "./src/app/shared/components/player/player.service.ts");
 var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+
+
 
 
 
@@ -3458,10 +4365,12 @@ var SharedModule = /** @class */ (function () {
                 _angular_material__WEBPACK_IMPORTED_MODULE_4__["MatSelectModule"],
                 _angular_material__WEBPACK_IMPORTED_MODULE_4__["MatCheckboxModule"],
                 _angular_flex_layout__WEBPACK_IMPORTED_MODULE_3__["FlexLayoutModule"],
-                _angular_material_tooltip__WEBPACK_IMPORTED_MODULE_5__["MatTooltipModule"]
+                _angular_material_tooltip__WEBPACK_IMPORTED_MODULE_5__["MatTooltipModule"],
+                _components_player_player_component__WEBPACK_IMPORTED_MODULE_10__["PlayerComponent"]
             ],
+            providers: [_components_player_player_service__WEBPACK_IMPORTED_MODULE_11__["PlayerService"]],
             entryComponents: [_components_dialog_parameters_dialog_parameters_component__WEBPACK_IMPORTED_MODULE_6__["DialogParametersComponent"], _components_dialog_create_model_dialog_create_model_component__WEBPACK_IMPORTED_MODULE_7__["DialogCreateModelComponent"]],
-            declarations: [_components_dialog_parameters_dialog_parameters_component__WEBPACK_IMPORTED_MODULE_6__["DialogParametersComponent"], _components_dialog_create_model_dialog_create_model_component__WEBPACK_IMPORTED_MODULE_7__["DialogCreateModelComponent"], _pipes_filtr_list_param_pipe__WEBPACK_IMPORTED_MODULE_8__["FiltrListParamPipe"], _directives_click_outside_directive__WEBPACK_IMPORTED_MODULE_9__["ClickOutsideDirective"]],
+            declarations: [_components_dialog_parameters_dialog_parameters_component__WEBPACK_IMPORTED_MODULE_6__["DialogParametersComponent"], _components_dialog_create_model_dialog_create_model_component__WEBPACK_IMPORTED_MODULE_7__["DialogCreateModelComponent"], _pipes_filtr_list_param_pipe__WEBPACK_IMPORTED_MODULE_8__["FiltrListParamPipe"], _directives_click_outside_directive__WEBPACK_IMPORTED_MODULE_9__["ClickOutsideDirective"], _components_player_player_component__WEBPACK_IMPORTED_MODULE_10__["PlayerComponent"]],
         })
     ], SharedModule);
     return SharedModule;

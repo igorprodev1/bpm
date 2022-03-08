@@ -47,6 +47,7 @@ export class DialogParametersComponent implements OnInit, AfterViewInit {
         this.formulaArr.splice(this.formulaIndex, 0, "|");
       }
       this.textArea.nativeElement.focus();
+      document.getElementById("wrap-dialog-scroll").scrollTo(0, 0);
       this.chRef.detectChanges();
     }, 500);
   }
@@ -106,6 +107,9 @@ export class DialogParametersComponent implements OnInit, AfterViewInit {
   }
 
   modelChange(id) {
+    this.selectedClass = null;
+    this.selectedObject = null;
+    this.selectedParam = null;
     this.componentService.getAllById(id).subscribe((data: any) => {
       this.listComponents = data;
       this.listClass = [];
@@ -133,7 +137,12 @@ export class DialogParametersComponent implements OnInit, AfterViewInit {
   }
 
   paramsFilter(e) {
+    this.selectedObject = null;
+    this.selectedParam = null;
+  }
 
+  selectedObjectChange(){
+    this.selectedParam = null;
   }
 
   ok() {
@@ -195,6 +204,9 @@ export class DialogParametersComponent implements OnInit, AfterViewInit {
         //   this.formula += this.selectedFormulaVar;
         // }
         this.formulaArr.splice(this.formulaIndex, 0, this.selectedFormulaVar);
+        this.formulaIndex += 1;
+        this.formulaItemClick({}, this.formulaIndex);
+        this.textArea.nativeElement.focus();
   }
 
   searchById(id, arr) {

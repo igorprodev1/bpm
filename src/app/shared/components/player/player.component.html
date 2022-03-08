@@ -1,0 +1,61 @@
+<div *ngIf="data && data[0] && data[0][cursor] && !hidde" class="player-wrap">
+  <div class="actions-buttons">
+    <button 
+      mat-icon-button 
+      matTooltip="Info about the action Info about the action Info about the action Info about the action Info about the action Info about the action Info about the action Info about the action Info about the action Info about the action Info about the action Info about the action Info about the action " 
+      matTooltipPosition="below"
+      (click)="cursor = 4"
+    >
+      <i class="material-icons">
+        skip_previous
+      </i>
+    </button>
+    <button (click)="pause()" mat-icon-button>
+      <i class="material-icons">
+        pause
+      </i>
+    </button>
+    <button (click)="play()" mat-icon-button>
+      <i class="material-icons">
+        play_arrow
+      </i>
+    </button>
+    <button (click)="cursor = data[0].length - 2" mat-icon-button>
+      <i class="material-icons">
+        skip_next
+      </i>
+    </button>
+  </div>
+  <div>
+    <div class="labeles">
+      <div class="box time">
+        Time Stamp
+      </div>
+      <div class="box date">
+        {{data[0][cursor]}}
+      </div>
+      <button mat-icon-button>
+        <img width="30px" src="assets/icons/png/chart-down.png" alt="">
+      </button>
+      <button mat-icon-button>
+        <img width="30px" src="assets/icons/png/chart-up.png" alt="">
+      </button>
+      <!-- <div style="font-size: 14px;" (click)="close()">X</div> -->
+    </div>
+    <div class="field">
+      <button (click)="skipPrevious()" mat-icon-button style="margin-right: -18px;">
+        <i class="material-icons" style="font-size: 38px;">
+          arrow_left
+        </i>
+      </button>
+      <div class="slider-wrap">
+        <input [(ngModel)]="cursor" type="range" min="4" [max]="data[0].length - 2" (ngModelChange)="cursorChange($event)">
+      </div>
+      <button (click)="skipNext()" mat-icon-button style="margin-left: -18px;">
+        <i class="material-icons" style="font-size: 38px;">
+          arrow_right
+        </i>
+      </button>
+    </div>
+  </div>
+</div>

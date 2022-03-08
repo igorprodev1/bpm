@@ -5,16 +5,21 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dial
 import { DialogParametersComponent } from '../shared/components/dialog-parameters/dialog-parameters.component';
 import { ComponentClass, ParameterClass } from '../shared/model';
 import { ActivatedRoute } from '@angular/router';
-import { Subject } from "rxjs";
+import { Subject, forkJoin } from "rxjs";
 import { debounceTime, distinctUntilChanged } from "rxjs/internal/operators";
 import { AuthService } from '../auth/auth.service';
+import { DialogCreateModelComponent } from '../shared/components/dialog-create-model/dialog-create-model.component';
+import { HttpClient } from '@angular/common/http';
+import { PlayerService } from '../shared/components/player/player.service';
+// var windows1251 = require('windows-1251');
 declare var d3;
+declare var windows1251;
 @Component({
   selector: 'app-model-main',
   templateUrl: './model-main.component.html',
   styleUrls: ['./model-main.component.scss']
 })
-export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
+export class ModelMainComponent implements OnInit, OnDestroy, AfterViewInit, OnDestroy {
   types = [
     "Input",
     "Output",
@@ -60,13 +65,18 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
   formulaSaverOld = {};
   saverComponent = [];
   modelsKeys = {};
-
+  dataCopy;
+  selectedModalObj;
+  modelID;
+  cursor;
   constructor(
     private modelService: ModelService,
     private componentService: ComponentService,
     public dialog: MatDialog,
     private authService: AuthService,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private http : HttpClient,
+    private playerService: PlayerService
   ) {
     this.modelId = this.activatedRoute.snapshot.paramMap.get('id');
     this.authService.me().subscribe(data => {
@@ -78,59 +88,186 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
         });
         this.modelList = data;
         this.modelList.forEach((model) => {
+          if(this.modelId === model._id){
+            this.modelID = model.id;
+          }
           this.modelsKeys[model._id] = model.id;
         })
-        this.componentService.getAllById(this.modelId).subscribe((data: any) => {
-          this.data = data;
-          this.saverComponent = [JSON.parse(JSON.stringify( this.data ))];
-          console.log(data);
-
-          this.calc();
-          setTimeout(() => {
-            this.removeAll();
-            this.drowLines();
-            this.drow();
-          }, 1000);
-        });
+        this.modelService.getAll().subscribe((data: any) => {
+          data.forEach(element => {
+            if (element._id === this.modelId) {
+              this.modelService.selectedModelEvent.emit(element);
+              this.selectedModalObj = element;
+            }
+          });
+        })
+       this.getData();
       });
     });
 
-    // this.setInterval = setInterval(() => {
-    //   this.removeAll()
-    //   this.drowLines()
-    //   this.drow();
-    //   this.txtQueryChanged.next(this.uuidv4());
-    // }, 5000);
-
-    this.txtQueryChanged
-      // .pipe(debounceTime(800), distinctUntilChanged())
+    this.setInterval = setInterval(() => {
+      this.removeAll()
+      this.drowLines()
+      this.drow();
+      // this.txtQueryChanged.next(this.uuidv4());
+      console.log(23)
+    }, 5000);
+     this.txtQueryChanged
       .subscribe(model => {
-        this.saverComponent.push(JSON.parse(JSON.stringify( this.data )));
+          this.updateQuery(model);
+        // if(!this.cursor){
+        //   this.updateQuery(model);
+        // }
+        // else {
 
-        let id = this.data[model.selected];
-        if (id) {
-          this.componentService.update(id).subscribe((data) => {
-          });
+        //   let obj = this.data[model.selected];
+        //   for (const p of obj.parameters) {
+        //     this.formulaSaver[this.modelID + "." + obj.id + "." + p.id] = p.value;
+        //   }
 
-          if (!model.drag) {
-            this.componentService.getAllByUserId(this.user._id).subscribe((data: any) => {
-              this.formulaData = data;
-              this.formulaSaver = {};
-              this.calc();
-            });
+        //   this.setDataPlayer(null);
+        // }
+      });
+
+      this.txtQueryChangedDebounce
+      .pipe(debounceTime(500), distinctUntilChanged())
+      .subscribe(model => {
+          this.updateQuery(model);
+        // if(!this.cursor){
+        //   this.updateQuery(model);
+        // }
+        // else {
+        //   console.log(this.dataPlayer);
+
+        //   let obj = this.data[model.selected];
+        //   for (const p of obj.parameters) {
+        //     this.formulaSaver[this.modelID + "." + obj.id + "." + p.id] = p.value;
+        //   }
+        //   // this.setDataPlayer(null);
+        // }
+      });
+
+
+    this.playerService.cursorEmitter.subscribe((cursor) => {
+      this.formulaSaver = {};
+      this.cursor = cursor;
+      if(this.readOnly)
+      for (let i = 1; i < this.dataPlayer.length; i++) {
+
+        for (let item of this.data) {
+
+          if (item && item.id && item.id.toLowerCase().trim() === this.dataPlayer[i][0].toLowerCase().trim()) {
+
+            for (let param of item.parameters) {
+
+              if (param.id.toLowerCase().trim() === this.dataPlayer[i][2].toLowerCase().trim()) {
+                param.value = this.dataPlayer[i][cursor];
+                this.formulaSaver[this.modelID + "." + item.id + "." + param.id] = this.dataPlayer[i][cursor];
+              } else {
+                this.formulaSaver[this.modelID + "." + item.id + "." + param.id] = param.value;
+              }
+            }
           }
         }
-        if (!model.drag)
-          setTimeout(() => {
-            this.removeAll();
-            this.drow();
-          }, 1000);
-      });
+
+      }
+      this.clear();
+
+    })
   }
 
-  calc() {
+  updateQuery(model) {
+    this.saverComponent.push(JSON.parse(JSON.stringify( this.data )));
+
+    let id = this.data[model.selected];
+    if (id) {
+      this.componentService.update(id).subscribe((r) => {
+        if (!model.drag) {
+          this.componentService.getAllByUserId(this.user._id).subscribe((data: any) => {
+            this.formulaData = data;
+            this.formulaSaver = {};
+            new Promise((resolve, reject) => {this.calc(resolve, reject)}).then(() => {
+              this.removeAll();
+              this.drow();
+              if(!this.readOnly) {
+                this.setDataPlayer(null);
+              }
+            });
+          });
+        }
+      });
+    }
+  }
+
+  getData() {
+    this.componentService.getAllById(this.modelId).subscribe((data: any) => {
+      this.data = JSON.parse(JSON.stringify( data ));
+      this.dataCopy = JSON.parse(JSON.stringify( data ));
+      this.saverComponent = [...this.saverComponent, JSON.parse(JSON.stringify( this.data ))];
+      new Promise((resolve, reject) => {this.calc(resolve, reject)}).then(() => {
+        this.removeAll();
+        this.drowLines();
+        this.drow();
+      });
+    });
+  }
+  copyIndexCounter = {};
+  selectedCopyIndex;
+  @HostListener('window:keydown',['$event'])
+  onKeyPress($event: KeyboardEvent) {
+      if(($event.ctrlKey || $event.metaKey) && $event.keyCode == 67) {
+        console.log('CTRL + C', this.selected);
+        this.selectedCopyIndex = this.selected;
+      }
+
+      if(($event.ctrlKey || $event.metaKey) && $event.keyCode == 86) {
+        console.log('CTRL +  V', this.data[this.selectedCopyIndex]);
+        if((this.selectedCopyIndex || this.selectedCopyIndex === 0)  && this.data[this.selectedCopyIndex]){
+          if(!this.copyIndexCounter[this.selectedCopyIndex]) {
+            this.copyIndexCounter[this.selectedCopyIndex] = 0;
+          }
+          let obj = JSON.parse(JSON.stringify(this.data[this.selectedCopyIndex]));
+          delete obj._id;
+          let id = obj.id.slice();
+          obj.id = obj.id + "1";
+          obj.x = obj.x + 50;
+          obj.y = obj.y + 150 + (this.copyIndexCounter[this.selectedCopyIndex] * 80);
+          obj.selected = [];
+          obj.parameters.forEach(p => {
+            if (p.value && p.value.charAt(0) === "=") {
+              var re = new RegExp(id, 'g');
+              p.value = p.value.replace(re, obj.id).slice();
+            }
+            });
+          let res;
+           do {
+             res = this.data.find((el) => {
+              return el.id === obj.id;
+            });
+            if(res) {
+              obj.id += "1";
+            }
+          } while(res);
+          this.componentService.create(obj).subscribe(data => {
+            this.componentService.getAllByUserId(this.user._id).subscribe((comp: any) => {
+              this.formulaData = comp;
+              this.copyIndexCounter[this.selectedCopyIndex] += 1;
+              this.saverComponent.push(JSON.parse(JSON.stringify(this.data)));
+              this.data.push(JSON.parse(JSON.stringify(data)));
+              this.clear();
+              this.dragType = null;
+            });
+
+          });
+        }
+      }
+  }
+
+
+
+  calc(resolve?, reject?) {
     this.data.forEach((comp) => {
-      comp.parameters.forEach(element => {
+      comp.parameters.forEach((element, i) => {
         if (element.value) {
           let v = element.value;
           let spcaSpit = v.split(" ");
@@ -140,6 +277,11 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
               if (!this.formulaSaver[earr[2]] && !this.formulaSaver[element]) {
                 this.formulaSearch(element);
               }
+            }
+
+            if(comp.parameters.length === (i+1) && spcaSpit.length === (index+1 )){
+              if(resolve)
+                resolve();
             }
           });
         }
@@ -158,7 +300,6 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
     this.startDrowLine = null;
     this.removeAll();
     this.drowLines();
-    console.log(8)
     this.drow();
   }
 
@@ -167,12 +308,6 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
     // if (
     //   (event.keyCode === 46 || event.keyCode === 8) && this.selected
     // ) {
-    //   this.saverComponent.push(JSON.parse(JSON.stringify( this.data )));
-    //   this.componentService.delete(this.data[this.selected]).subscribe((data) => {
-    //     this.data.splice(this.selected, 1);
-
-    //     this.clear();
-    //   });
     // }
 
     if (event.keyCode === 90 && (event.ctrlKey || event.metaKey)) {
@@ -193,10 +328,10 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
 
     if ((event.keyCode === 46 || event.keyCode === 8) && (this.selectedLineId || this.selectedLineId === 0)) {
       this.selectedLineFrom.selected.forEach((id, index) => {
-        if (id === this.selectedLineTo._id) {
+        if (id === this.selectedLineTo.id) {
           this.saverComponent.push(JSON.parse(JSON.stringify( this.data )));
           this.data.forEach((element, i) => {
-            if (element._id === this.selectedLineFrom._id) {
+            if (element.id === this.selectedLineFrom.id) {
               this.data[i].selected.splice(index, 1);
 
               this.txtQueryChanged.next({
@@ -238,7 +373,10 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.modelService.selectedModelEvent.emit(null);
     clearInterval(this.setInterval);
+    this.readOnly = false;
+    this.playerService.closePlayer.emit(this.readOnly);
   }
 
   ngAfterViewInit() {
@@ -249,21 +387,35 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.saverComponent) {
       let arr = this.saverComponent[this.saverComponent.length - 2];
       if (arr && this.saverComponent.length > 1) {
+        let oldData = JSON.parse(JSON.stringify( this.data ));
         this.data = JSON.parse(JSON.stringify( arr ));
         this.saverComponent.pop();
-
+        let observableList = [];
         this.data.forEach(element => {
-          this.componentService.update(element).subscribe((data) => {
+          const res = JSON.parse(JSON.stringify( oldData )).find((el) => {
+            return el.id === element.id;
           });
+
+          if(!res) {
+            delete element._id;
+            observableList.push(this.componentService.create(element));
+          } else {
+            observableList.push(this.componentService.update(element));
+          }
+
         });
+        let obs = forkJoin(observableList);
+        obs.subscribe(t => {
         this.componentService.getAllByUserId(this.user._id).subscribe((data: any) => {
-          this.formulaData = data;
-          this.formulaSaver = {};
-          this.calc();
-          // this.removeAll();
-          // this.drowLines();
-          // this.clear();
-          // this.drow();
+            this.formulaData = data;
+            this.formulaSaver = {};
+            this.calc();
+            this.clear();
+            // this.removeAll();
+            // this.drowLines();
+            // this.clear();
+            // this.drow();
+          });
         });
       }
     }
@@ -480,10 +632,12 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
         document.getElementById(type).addEventListener(
           "dragstart",
           ev => {
-            ev.dataTransfer.setData('text', 'foo');
-            this.dragType = type;
-            if (this.isStart && type === "Start") {
-              event.preventDefault();
+            if(!this.readOnly){
+              ev.dataTransfer.setData('text', 'foo');
+              this.dragType = type;
+              if (this.isStart && type === "Start") {
+                event.preventDefault();
+              }
             }
           },
           false
@@ -513,6 +667,8 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
         model.y = y;
         model.objectClass = this.dragType;
         model.modelId = this.modelId;
+        model.modelIdName = this.modelsKeys[this.modelId];
+
         model.userId = this.user._id;
         model.id = this.dragType + (this.data.filter(value => value.objectClass === this.dragType).length + 1);
         if(this.dragType !== 'Max' && this.dragType !== 'Min') {
@@ -524,7 +680,6 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
           let p1 = new ParameterClass("Priority", "Priority", "0", 1);
           model.parameters = [p1];
         }
-
         this.componentService.create(model).subscribe((data) => {
           this.saverComponent.push(JSON.parse(JSON.stringify( this.data )));
           this.data.push(data);
@@ -540,8 +695,6 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
   drow() {
     this.drowLines();
 
-    console.log(2323)
-
     this.data.forEach((element, index, arr) => {
       switch (element.objectClass) {
         case "Input":
@@ -556,15 +709,17 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
           dy = element.y - 8;
           color = this.colors[element.objectClass];
           let count = 0;
+          let countS = 0;
 
           element.parameters.forEach((param, index) => {
             if (param.showOnDiagram) {
-
+              if(param.controlType === "Slider"){
+                countS++;
+              }
               count++;
             }
           });
-
-          let h = (60 + (count > 3 ? ((count - 3) * 16 + (count * 5)) : 0));
+          let h = (65 + (count > 3 ? ((count - 3) * 27 + ( countS * 5) + (count * 5)) : 0+ ( countS * 5)));
           let selected = (this.selected !== null && (+this.selected === +index)) ? "stroke-width:1;stroke:rgb(0,0,0)" : "";
           let g = this.conteiner.append("g").attr("class", "g");
           g.append("rect")
@@ -599,11 +754,18 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
               }
             })
             .on("click", (d, i, s) => {
+              if(!this.readOnly){
               d3.event.stopPropagation();
+              this.selectedModal = s[0].id;
+              this.selected = s[0].id;
+              this.removeAll();
+              this.drow();
               if (this.activeArrow)
                 this.shepClick(s[0].id);
+              }
             })
             .on("dblclick", (d, i, s) => {
+              if(!this.readOnly){
               this.selectedModal = s[0].id;
               let name = this.data[this.selectedModal].objectClass + (this.data[this.selectedModal].parameters.length + 1);
               this.newParametr = new ParameterClass("Par" + (this.data.filter(value => value.objectClass === this.data[this.selectedModal].objectClass).length + 1), "", "0")
@@ -613,6 +775,7 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
               this.drow();
               this.activeArrow = null;
               this.startDrowLine = null;
+              }
             });
 
           g.append("text")
@@ -625,26 +788,73 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
             .attr("x", element.x + 140)
             .attr("y", element.y - 13)
             .text("X")
+            .attr("cursor", "pointer")
             .on("click", (d, i, s) => {
+              if(!this.readOnly){
+
               d3.event.stopPropagation();
               let id = s[0].id.split("-")[0];
 
-              this.componentService.delete(this.data[id]).subscribe((data) => {
-                this.data.splice(id, 1);
+              // this.componentService.delete(this.data[id]).subscribe((data) => {
+              //   this.data.splice(id, 1);
 
-                this.clear();
+              //   this.clear();
+              // });
+              const dialogRef = this.dialog.open(DialogCreateModelComponent, {
+                width: '450px',
+                data: {
+                  label: 'You delete the object! Are you sure?',
+                  deleteMode: true
+                }
               });
-            });
+              dialogRef.afterClosed().subscribe(model => {
+                if (model) {
+                 console.log(this.saverComponent)
+                  this.saverComponent.push(JSON.parse(JSON.stringify( this.data )));
+                  console.log(this.saverComponent)
+                  let observableList = [];
+                  this.componentService.getAllByUserId(this.user._id).subscribe((data: any) => {
+                    this.formulaData = data;
+                    this.formulaData.forEach(comp => {
+                      comp.parameters.forEach(param => {
+                        if (param.value && param.value.charAt(0) === "=") {
+                          this.data[id].parameters.forEach(p => {
+                            let element = this.data[id].modelIdName + "." +
+                            this.data[id].id + "." + p.id;
+                            var re = new RegExp(element, 'g');
+                            param.value = param.value.replace(re, "0");
+                          });
+                        }
+                      });
+                      observableList.push(this.componentService.update(comp));
+                    });
+
+                    let obs = forkJoin(observableList);
+                    obs.subscribe(t => {
+                      this.componentService.delete(this.data[id]).subscribe((data) => {
+                        this.selectedModal = null;
+                        this.selected = null;
+                        this.getData();
+                      });
+                    });
+                  });
+                }
+              });
+
+      }});
 
           g.append("text")
             .attr("id", index + "-arrow")
             .attr("x", element.x + 135)
             .attr("y", element.y + 5)
             .text("=>")
+            .attr("cursor", "pointer")
             .on("click", (d, i, s) => {
+              if(!this.readOnly){
               d3.event.stopPropagation();
               let id = s[0].id.split("-")[0];
               this.shepClick(id);
+              }
             });
 
           g.append("text")
@@ -652,6 +862,7 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
             .attr("x", element.x)
             .attr("y", element.y + 5)
             .text("|||")
+            .attr("cursor", "pointer")
             .call(
               d3
                 .drag()
@@ -664,7 +875,9 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
           let parameters = element.parameters.slice();
           parameters.forEach((param, paramIndex) => {
             if (param.showOnDiagram) {
-              let py = element.y + 70 - 50 - (countIndex * 20) + (count >= 3 ? ((count - 3) * 16 + (count * 7)) : (count > 1) ? (count * 4) : -9);
+              let py = element.y + 79 - 50 - (countIndex * 24) + (count >= 3 ?
+                 ((count - 3) * 24 + (count * 7)) :
+                  (count > 1) ? (count * 4) : -9);
               switch (param.controlType) {
                 case "Value":
                 case "":
@@ -680,22 +893,25 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
                       }
                     });
                     spcaSpit.shift();
+
                     try {
                       this.formulaSaver[this.modelsKeys[element.modelId] + "." + element.id + "." + param.id] = this.notEval(spcaSpit.join(''));
                     } catch {
                       this.calc();
                     }
-
+                    let res = this.formulaSaver[this.modelsKeys[element.modelId] + "." + element.id + "." + param.id] || 0;
                     g.append("text")
                       .attr("x", element.x + 20)
                       .attr("y", py)
-                      .text((param.name || param.id) + " - " + (parseFloat(this.formulaSaver[this.modelsKeys[element.modelId] + "." + element.id + "." + param.id] || "").toFixed(1)));
+                      .text((param.name || param.id) + ": " +
+                      ((parseFloat(res).toFixed(1)))
+                      );
 
                   } else {
                     g.append("text")
                       .attr("x", element.x + 20)
                       .attr("y", py)
-                      .text((param.name || param.id) + " - " + parseFloat(v || "").toFixed(1));
+                      .text((param.name || param.id) + ": " + parseFloat(v || "").toFixed(1));
                   }
 
                   break;
@@ -735,75 +951,108 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
                   //   .attr("y", py)
                   //   .text((param.name || param.id) + " - ");
                    l = (param.name || param.id).length;
-                   console.log(param)
                   gR.append("foreignObject")
                     .attr("x", element.x + ((param.name || param.id).length) + 5)
-                    .attr("y", py - 10)
+                    .attr("y", py - 5)
                     .attr("width", 120)
-                    .attr("height", 16)
+                    .attr("height", 30)
                     .attr("class", "foreignObject-input-bmp")
                     .html((d) => {
                       return `
-                      <div style="display:flex;align-items: center;">
-                      <input id="${index}-${paramIndex}-left" class="range-button" type="button" value="<">
-                      </input>
-                      <input id="${index}-${paramIndex}" type="range"
-                      min="${+param.sliderMin - 1}" max="${+param.sliderMax + 1}"
-                      step="${param.sliderStep}" value="${param.value}" />
-                      <input id="${index}-${paramIndex}-right" class="range-button" type="button" value=">">
-                      </input>
+                      <div id="${index}-${paramIndex}-slider" class="cust-slider">
+                      <div id="${index}-${paramIndex}-slider-value" class="slider-value">
+                      ${(param.name || param.id)}: ${parseFloat(param.value || "").toFixed(1)}
                       </div>
-
+                      <div class="slider-wrap-outer">
+                        <button id="${index}-${paramIndex}-left" class="left">
+                          <i class="material-icons">
+                            keyboard_arrow_left
+                          </i>
+                        </button>
+                        <div id="${index}-${paramIndex}-slider-wrap" class="slider-wrap">
+                          <div id="${index}-${paramIndex}-sliderFillBg" class="fill-bg"></div>
+                          <div id="${index}-${paramIndex}-sliderIndecator" class="indecator" draggable="true">
+                            <div class="bg-inside"></div>
+                          </div>
+                        </div>
+                        <button id="${index}-${paramIndex}-right" class="right">
+                          <i class="material-icons">
+                            keyboard_arrow_right
+                          </i>
+                        </button>
+                      </div>
+                    </div>
                       `
                     });
-                  gR.append("text")
-                    .attr("font-size", "10px")
-                    .attr("x", element.x + 50)
-                    .attr("y", py - 6)
-                    .text((param.name || param.id) + "-" + parseFloat(param.value || "").toFixed(1));
+
+                    document.getElementById(`${index}-${paramIndex}-sliderIndecator`).addEventListener(
+                      "dragstart",
+                      ev => {
+                        console.log("sliderIndecator")
+                      },
+                      false
+                    );
 
                   self = this;
                   let rangeElement: any = document.getElementById(`${index}-${paramIndex}`);
-                  rangeElement.onchange =  (e) => {
-                    setTimeout(() => {
-                      this.dragSelected = index;
-                      this.data[index].parameters[paramIndex].value = rangeElement.value.toString();
-                      this.txtQueryChanged.next({
-                        value: rangeElement.value,
-                        selected: this.dragSelected
-                      });
-                    }, 150);
-                  };
 
+                  self.sladerChange(param, paramIndex, index);
                   let rangeElementleft: any = document.getElementById(`${index}-${paramIndex}-left`);
                   rangeElementleft.onclick = function (e) {
-
-                    setTimeout(() => {
-                    let value = +rangeElement.value - +param.sliderStep;
+                    if(!self.readOnly){
+                      let value = +param.value - +param.sliderStep;
                       if (value >= param.sliderMin) {
                         self.dragSelected = index;
                         self.data[index].parameters[paramIndex].value = value.toString();
-                        self.txtQueryChanged.next({
+                        document.getElementById(`${index}-${paramIndex}-slider-value`).textContent
+                        = `${(param.name || param.id)}: ${parseFloat(value.toString() || "").toFixed(1)}`
+                        self.txtQueryChangedDebounce.next({
                           value: value,
                           selected: self.dragSelected
                         });
+
+                        self.sladerChange(param, paramIndex, index);
                       }
-                    }, 20);
+                    }
+
                   };
 
                   let rangeElementright: any = document.getElementById(`${index}-${paramIndex}-right`);
                   rangeElementright.onclick = function (e) {
-                    setTimeout(() => {
-                      let value = +rangeElement.value + +param.sliderStep;
-                      if (value <= param.sliderMax) {
+                    if(!self.readOnly){
+                      let value = +param.value + +param.sliderStep;
+
+                      if (value <= (param.sliderMax + 1)) {
                         self.dragSelected = index;
                         self.data[index].parameters[paramIndex].value = value.toString();
-                        self.txtQueryChanged.next({
+                        document.getElementById(`${index}-${paramIndex}-slider-value`).textContent
+                        = `${(param.name || param.id)}: ${parseFloat(value.toString() || "").toFixed(1)}`
+                        self.txtQueryChangedDebounce.next({
                           value: value,
                           selected: self.dragSelected
                         });
+                        self.sladerChange(param, paramIndex, index);
                       }
-                    }, 20);
+                    }
+                  };
+
+                  let sliderwrapElementright: any = document.getElementById(`${index}-${paramIndex}-slider-wrap`);
+                  sliderwrapElementright.onclick = function (e) {
+                    if(!self.readOnly){
+                      let value = ((e.offsetX / 90 * 100) * ((param.sliderMax - param.sliderMin) / 100)) + param.sliderMin;
+                      value = Math.round(value / param.sliderStep) * param.sliderStep;
+                      if (value <= (param.sliderMax + 1)) {
+                        self.dragSelected = index;
+                        self.data[index].parameters[paramIndex].value = value.toString();
+                        document.getElementById(`${index}-${paramIndex}-slider-value`).textContent
+                        = `${(param.name || param.id)}: ${parseFloat(value.toString() || "").toFixed(1)}`
+                        self.txtQueryChangedDebounce.next({
+                          value: value,
+                          selected: self.dragSelected
+                        });
+                        self.sladerChange(param, paramIndex, index);
+                      }
+                    }
                   };
                   break;
                 default:
@@ -830,11 +1079,14 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
       function dragstarted(d) {
         // d3.select(this)
         //   .classed("active", true);
-        self.start_x = +d3.event.x;
-        self.start_y = +d3.event.y;
+        if(!self.readOnly){
+          self.start_x = +d3.event.x;
+          self.start_y = +d3.event.y;
+        }
       }
 
       function dragged(d) {
+        if(!self.readOnly){
         let current_scale, current_scale_string;
         let transform = document.getElementById('wrap')
         if (transform.getAttribute("transform") === null) {
@@ -870,7 +1122,7 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
         self.removeAll();
         self.drow();
 
-
+        }
       }
 
       function dragended(d) {
@@ -882,11 +1134,24 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
         });
       }
     });
+
   }
 
   formulaSaver = {};
   formulaSearchRun;
   formulaData;
+  event
+
+  sladerChange(param, paramIndex, index){
+    let otions = {
+      min: param.sliderMin,
+      max: param.sliderMax,
+      value: param.value
+    }
+
+    document.getElementById(`${index}-${paramIndex}-sliderIndecator`).style.left = `calc(${((otions.value - otions.min) / (otions.max - otions.min)) * 100}% - ${15 * ((otions.value - otions.min) / (otions.max - otions.min))}px)`
+    document.getElementById(`${index}-${paramIndex}-sliderFillBg`).style.width = `calc(${((otions.value - otions.min) / (otions.max - otions.min)) * 100}% - ${15 * ((otions.value - otions.min) / (otions.max - otions.min))}px)`
+  }
 
   formulaSearch(element) {
     let arr = element.split(".");
@@ -897,21 +1162,26 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
         this.formulaDataSearch(data, arr, element);
       });
     } else if (this.formulaData) {
+
       this.formulaDataSearch(this.formulaData, arr, element);
     }
   }
 
   formulaDataSearch(data, arr, element) {
-    data.forEach(comp => {
-      comp.parameters.forEach(param => {
+    new Promise((resolve, reject) => { data.forEach(comp => {
+      comp.parameters.forEach((param, i) => {
         if (this.modelsKeys[comp.modelId] === arr[0] && comp.id === arr[1] && param.id === arr[2]) {
           this.formulaSaver[element] = +param.value;
         }
+        if((comp.parameters.length -1)  === i) {
+          resolve();
+        }
+
       });
     });
-    setTimeout(() => {
+    }).then(() => {
       this.clear();
-    }, 200);
+    });
   }
 
   clickArrow;
@@ -924,7 +1194,7 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
   drowLines() {
     this.data.forEach((value, index, arr) => {
       value.selected.forEach(item => {
-        let to = this.searchById(item, this.data);
+        let to = this.searchById(item, this.data, 'id');
         let from = this.data[index];
         if (to) {
           let x = +from.x;
@@ -1050,12 +1320,12 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
     } else {
       let count = 0;
       this.data[id].selected.forEach((element, index) => {
-        if (this.data[this.activeArrow]._id === element) {
+        if (this.data[this.activeArrow].id === element) {
           count++;
         }
       });
       this.data[this.activeArrow].selected.forEach((element, index) => {
-        if (this.data[id]._id === element) {
+        if (this.data[id].id === element) {
           count++;
         }
       });
@@ -1069,7 +1339,7 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
       }
 
       if (id !== this.activeArrow) {
-        this.data[this.activeArrow].selected.push(this.data[id]._id);
+        this.data[this.activeArrow].selected.push(this.data[id].id);
         this.txtQueryChanged.next({
           value: "query",
           selected: this.activeArrow
@@ -1100,9 +1370,10 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
     // });
 
   }
-  searchById(id, arr) {
+  searchById(id, arr, idField?) {
     if (arr) {
-      let result = arr.find(element => element._id === id);
+      let f = idField || "_id";
+      let result = arr.find(element => element[f] === id);
       return result;
     }
   }
@@ -1116,6 +1387,8 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
 
   txtQuery: string; // bind this to input with ngModel
   txtQueryChanged: Subject<any> = new Subject<any>();
+  txtQueryChangedDebounce: Subject<any> = new Subject<any>();
+
   onFieldChange(query: string) {
     this.txtQueryChanged.next({
       value: query,
@@ -1176,4 +1449,380 @@ export class ModelMainComponent implements OnInit, AfterViewInit, OnDestroy {
       this.clickArrow = false;
     }
   }
+
+  sliderChange(e, item, i) {
+    if(item.controlType === "Slider"){
+      if (+item.value < item.sliderMin) {
+        item.value = item.sliderMin.toString();
+        this.txtQueryChanged.next({
+          value: item.value,
+          selected: i
+        });
+      } else if (+item.value > item.sliderMax) {
+        item.value = item.sliderMax.toString();
+        this.txtQueryChanged.next({
+          value: item.value,
+          selected: i
+        });
+      }
+    }
+  }
+  canChangeId;
+  idModelChange(e) {
+    let data = this.returnCopyData();
+
+    const res = data.find((el) => {
+      return el.id === this.data[this.selectedModal].id;
+    });
+
+    if(!res) {
+      this.canChangeId = true;
+    }
+    console.log(data, this.data[this.selectedModal].id,this.canChangeId, res)
+  }
+
+  returnCopyData() {
+    let data;
+    if (this.saverComponent) {
+      let arr = this.saverComponent[this.saverComponent.length - 2];
+      if (arr && this.saverComponent.length > 1) {
+        data = JSON.parse(JSON.stringify( arr ));
+      } else {
+        data = this.dataCopy;
+      }
+    } else {
+      data = this.dataCopy;
+    }
+    return data;
+  }
+
+  onFieldChangeId(query: string) {
+      let data = this.returnCopyData();
+      let id = (document.getElementById("dataId") as any).value;
+      if (this.canChangeId) {
+        this.data.forEach(d => {
+          d.parameters.forEach(p => {
+            console.log(p.value, data[this.selectedModal].id, id)
+            var re = new RegExp(data[this.selectedModal].id, 'g');
+            p.value = p.value.replace(re, id);
+            console.log(p.value, data[this.selectedModal].id, id)
+          });
+          console.log(d)
+
+          this.componentService.update(d).subscribe((r) => {
+          });
+        });
+        this.saverComponent.push(JSON.parse(JSON.stringify( this.data )));
+
+      } else {
+        this.data[this.selectedModal].id = data[this.selectedModal].id;
+      }
+      this.txtQueryChanged.next({
+        value: id,
+        selected: this.selectedModal
+      });
+
+  }
+
+  validValue(item, i) {
+    if(item.controlType === "Slider"){
+      if (+item.value < item.sliderMin) {
+        item.value = item.sliderMin.toString();
+        this.txtQueryChanged.next({
+          value: item.value,
+          selected: i
+        });
+      } else if (+item.value > item.sliderMax) {
+        item.value = item.sliderMax.toString();
+        this.txtQueryChanged.next({
+          value: item.value,
+          selected: i
+        });
+      }
+    }
+  }
+
+  generateCSVPatern() {
+    let items = [
+      ['Obgect ID'],
+      ['Obgect name'],
+      ['Parameter ID'],
+      ['Parameter name'],
+      [`Timestamp\\Mesured`]];
+
+    for (const item of this.data) {
+      for (const param of item.parameters) {
+        if(param.measurable){
+
+        items[0].push(item.id);
+        console.log(item);
+
+        items[1].push(item.name);
+        items[2].push(param.id);
+        items[3].push(param.name);
+        let v = param.value;
+        console.log(items);
+
+        if (v && v.charAt(0) === "=") {
+          let spcaSpit = v.split(" ");
+
+          spcaSpit.forEach((element, index) => {
+            let earr = element.split(".");
+            if (earr.length == 3) {
+                spcaSpit[index] = this.formulaSaver[element];
+            }
+          });
+          spcaSpit.shift();
+          try {
+            items[4].push(parseFloat(this.notEval(spcaSpit.join('')).toFixed(1)).toString());
+          } catch {
+            items[4].push("0");
+          }
+
+        } else {
+          items[4].push(param.value);
+        }
+      }
+    }
+
+    }
+    console.log(items,(items.map(e => e.join(";")).join("\n")));
+
+    let csvContent = "data:text/csv;charset=utf-8,"
+    // + windows1251.decode(items.map(e => e.join(";")).join("\n"));
+    + (items.map(e => e.join(";")).join("\n"));
+
+
+    var encodedUri = encodeURI(csvContent);
+    var link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "my_data.csv");
+    document.body.appendChild(link); // Required for FF
+
+    link.click();
+  }
+
+  generateCSVFull() {
+    let items = []
+    for (let i = 0; i < this.dataPlayer.length; i++) {
+      for (let j = 0; j < this.dataPlayer[i].length; j++) {
+        if(!items[j] && this.dataPlayer[i][j]) {
+          items[j] = [];
+        }
+        if(items[j])
+        items[j].push(this.dataPlayer[i][j]);
+      }
+    }
+
+    console.log(items,(items.map(e => e.join(";")).join("\n")));
+
+    let csvContent = "data:text/csv;charset=utf-8,"
+    + (items.map(e => e.join(";")).join("\n"));
+
+
+    var encodedUri = encodeURI(csvContent);
+    var link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "my_data.csv");
+    document.body.appendChild(link); // Required for FF
+
+    link.click();
+  }
+
+  ConvertToCSV(objArray) {
+    var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
+    var str = '';
+
+    for (var i = 0; i < array.length; i++) {
+        var line = '';
+        for (var index in array[i]) {
+            if (line != '') line += ';'
+
+            line += array[i][index];
+        }
+
+        str += line + '\r\n';
+    }
+
+    return str;
+}
+
+
+  dataPlayer;
+  readOnly;
+
+  onChange(event) {
+    var file = event.srcElement.files[0];
+    if (file) {
+        var reader = new FileReader();
+        let self = this;
+        reader.readAsText(file, "UTF-8");
+        reader.onload = function (evt: any) {
+          console.log(evt.target.result);
+
+          self.setDataPlayer(self.csvJSON(evt.target.result));
+          self.playerService.dataEmitter.emit(self.dataPlayer);
+          self.readOnly = true;
+        };
+        reader.onerror = function (evt) {
+            console.log('error reading file');
+        }
+    }
+  }
+  dataPlayerData
+  setDataPlayer(data) {
+    if(data === null) {
+      data = this.dataPlayerData;
+    } else {
+      this.dataPlayerData = data;
+    }
+    let newArr = [];
+    // this.dataPlayer = data;
+    for(let j = 4; j < data[1].length; j++) {
+      for(let i = 1; i < data.length; i++) {
+        for(let item of this.data) {
+          if(item && item.id && item.id.toLowerCase().trim() === data[i][0].toLowerCase().trim()) {
+            for(let param of item.parameters) {
+              if(param.id.toLowerCase().trim() === data[i][2].toLowerCase().trim()) {
+                param.value = data[i][j];
+
+                this.formulaSaver[this.modelID + "." + item.id + "." + param.id] = data[i][j];
+              }
+            }
+          }
+        }
+        if(data.length - 1 === i) {
+          for(let item of this.data) {
+            for(let param of item.parameters) {
+              let v = param.value;
+
+              if (v && v.charAt(0) === "=") {
+                let spcaSpit = v.split(" ");
+
+                spcaSpit.forEach((element, index) => {
+                  let earr = element.split(".");
+                  if (earr.length == 3) {
+                      spcaSpit[index] = this.formulaSaver[element];
+                  }
+                });
+
+                spcaSpit.shift();
+                try {
+                  let flag;
+                  let res = this.notEval(spcaSpit.join(''));
+
+                  for(let i = 0; i < newArr.length; i++) {
+                    if(item.id === newArr[i][0] && param.id === newArr[i][2]){
+                      flag = true;
+                      newArr[i][j] = res.toString();
+                    }
+                  }
+
+                  if(!flag) {
+                    newArr.push([]);
+                    newArr[newArr.length - 1].push(item.id);
+                    newArr[newArr.length - 1].push(item.name);
+                    newArr[newArr.length - 1].push(param.id);
+                    newArr[newArr.length - 1].push(param.name);
+                    newArr[newArr.length - 1].push(res.toString());
+                  }
+                } catch{
+
+                }
+              }
+            }
+          }
+        }
+      }
+
+   }
+
+
+      this.dataPlayer = [...data, ...newArr];
+      console.log(this.dataPlayer);
+      if(data !== null){
+        this.getData();
+        this.formulaSaver = {};
+        this.calc();
+      }
+
+
+  }
+
+  csvJSON(csv){
+
+    var lines=csv.split("\n");
+
+    var result = [];
+
+    // NOTE: If your columns contain commas in their values, you'll need
+    // to deal with those before doing the next step
+    // (you might convert them to &&& or something, then covert them back later)
+    // jsfiddle showing the issue https://jsfiddle.net/
+    var headers=lines[0].split(",");
+
+    for(var i=0;i<lines.length;i++){
+
+        var obj = {};
+        var currentline=lines[i].split(";");
+
+        for(var j=0;j<currentline.length;j++){
+          if(!result[j]){
+            result[j] = [];
+          }
+          result[j].push(currentline[j])
+        }
+        // for(var j=0;j<headers.length;j++){
+        //     obj[headers[j]] = currentline[j];
+        // }
+
+        // result.push(obj);
+
+    }
+
+    return result; //JavaScript object
+    // return JSON.stringify(result); //JSON
+  }
+
+  switchPlayer(){
+    if(this.dataPlayer.length) {
+      this.readOnly = !this.readOnly;
+      this.playerService.closePlayer.emit(this.readOnly);
+      if(!this.readOnly){
+        for (let i = 0; i < this.data.length; i++) {
+          let copyObj = this.returnCopyData();
+          for (let j = 0; j < copyObj[i].parameters.length; j++) {
+            let p = copyObj[i].parameters[j];
+            if (p.value && p.value.charAt(0) === "=") {
+              this.data[i].parameters[j].value = p.value;
+            }
+          }
+          this.componentService.update(this.data[i]).subscribe((r) => {
+              this.componentService.getAllByUserId(this.user._id).subscribe((data: any) => {
+                this.formulaData = data;
+                this.formulaSaver = {};
+                new Promise((resolve, reject) => {this.calc(resolve, reject)}).then(() => {
+                  this.removeAll();
+                  this.drow();
+                });
+              });
+          });
+        }
+
+        setTimeout(() => {
+          this.formulaSaver = {};
+          this.dataPlayer = []
+          this.getData();
+        }, 8000);
+        setTimeout(() => {
+          this.setDataPlayer(null);
+        }, 15000);
+      }
+      console.log(this.formulaSaver);
+
+      this.calc();
+    }
+
+  }
+
 }

@@ -13,7 +13,7 @@ import { forkJoin } from 'rxjs';
   selector: 'app-model-list',
   templateUrl: './model-list.component.html',
   styleUrls: ['./model-list.component.scss']
-
+  
 })
 export class ModelListComponent implements OnInit {
   user;
@@ -57,7 +57,7 @@ export class ModelListComponent implements OnInit {
       if (model) {
         model.userId = this.user._id;
         model.ver = "1.0";
-
+        
         this.modelService.create(model).subscribe((data: any) => {
           this.router.navigate(['model/' + data._id]);
         });

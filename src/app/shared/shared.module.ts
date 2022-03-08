@@ -23,11 +23,13 @@ import {
   MatSelectModule,
   MatCheckboxModule
 } from '@angular/material';
-import {MatTooltipModule} from '@angular/material/tooltip';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { DialogParametersComponent } from './components/dialog-parameters/dialog-parameters.component';
 import { DialogCreateModelComponent } from './components/dialog-create-model/dialog-create-model.component';
 import { FiltrListParamPipe } from './pipes/filtr-list-param.pipe';
 import { ClickOutsideDirective } from './directives/click-outside.directive';
+import { PlayerComponent } from './components/player/player.component';
+import { PlayerService } from './components/player/player.service';
 
 @NgModule({
   imports: [
@@ -77,9 +79,11 @@ import { ClickOutsideDirective } from './directives/click-outside.directive';
     MatSelectModule,
     MatCheckboxModule,
     FlexLayoutModule,
-    MatTooltipModule
+    MatTooltipModule,
+    PlayerComponent
   ],
+  providers: [PlayerService],
   entryComponents: [DialogParametersComponent, DialogCreateModelComponent],
-  declarations: [DialogParametersComponent, DialogCreateModelComponent, FiltrListParamPipe, ClickOutsideDirective],
+  declarations: [DialogParametersComponent, DialogCreateModelComponent, FiltrListParamPipe, ClickOutsideDirective, PlayerComponent],
 })
 export class SharedModule { }

@@ -4,9 +4,9 @@
   <meta charset="utf-8">
   <title>cogintech</title>
   <base href="/">
-
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/postscribe/2.0.8/postscribe.min.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- <link rel="icon" type="image/x-icon" href="favicon.ico"> -->
+  <link rel="icon" type="image/x-icon" href="favicon.png" />
   <link href="https://fonts.googleapis.com/css?family=Material+Icons|Material+Icons+Outlined|Material+Icons+Two+Tone|Material+Icons+Round|Material+Icons+Sharp" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=Exo:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
   <link href="assets/icons/bpm-icons/dist/css/bpmn.css" rel="stylesheet">
@@ -15,4 +15,52 @@
 <body>
   <app-root></app-root>
 </body>
+<div id="script"></div>
+
+
+
+<script type="text/javascript">
+  var reformalOptions = {
+      project_id: 983286,
+      project_host: "feedback.cogintech.ru",
+      tab_orientation: "left",
+      tab_indent: "65%",
+      tab_bg_color: "#5180d6",
+      tab_border_color: "#FFFFFF",
+      tab_image_url: "http://tab.reformal.ru/T9GC0LfRi9Cy0Ysg0Lgg0L%252FRgNC10LTQu9C%252B0LbQtdC90LjRjw==/FFFFFF/4bfb34d91c8d7fb481972ca3c84aec38/left/0/tab.png",
+      tab_border_width: 0
+  };
+  reformal_wdg_w    = "713";
+  reformal_wdg_h    = "460";
+  reformal_wdg_domain    = "cogintech";
+  reformal_wdg_mode    = 0;
+  reformal_wdg_title   = "CogInTech";
+  reformal_wdg_ltitle  = "Leave feedback";
+  reformal_wdg_lfont   = "";
+  reformal_wdg_lsize   = "";
+  reformal_wdg_color   = "#5180d6";
+  reformal_wdg_bcolor  = "#5180d6";
+  reformal_wdg_tcolor  = "#FFFFFF";
+  reformal_wdg_align   = "left";
+  reformal_wdg_waction = 0;
+  reformal_wdg_vcolor  = "#9FCE54";
+  reformal_wdg_cmline  = "#E0E0E0";
+  reformal_wdg_glcolor  = "#105895";
+  reformal_wdg_tbcolor  = "#FFFFFF";
+  reformal_wdg_bimage = "8489db229aa0a66ab6b80ebbe0bb26cd.png";
+  if (window.location.href.indexOf("dtb") > -1) {
+    postscribe('#script', `<script type="text/javascript" language="JavaScript" src="http://idea.informer.com/tabn2v4.js?domain=cogintech"><\/script>`);
+  } else {
+    (function() {
+        var script = document.createElement('script');
+        script.type = 'text/javascript'; script.async = true;
+        script.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'media.reformal.ru/widgets/v3/reformal.js';
+        document.getElementsByTagName('head')[0].appendChild(script);
+    })();
+  }
+
+</script>
+<noscript><a href="http://cogintech.idea.informer.com">CogInTech feedback</a> <a href="http://idea.informer.com"> Powered by <img src="http://widget.idea.informer.com/tmpl/images/widget_logo.jpg" /></a></noscript>
+
+<noscript><a href="http://reformal.ru"><img src="http://media.reformal.ru/reformal.png" /></a><a href="http://feedback.cogintech.ru">Oтзывы и предложения для КогИнТек</a></noscript>
 </html>

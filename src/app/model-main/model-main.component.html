@@ -1,3 +1,7 @@
+
+<input #file  onclick="this.value=null;" type="file" (change)="onChange($event)"  style="display: none;"/>
+
+
 <div class="bpm-wrap">
   <div class="palette-entries">
     <div *ngFor="let item of types" class="bpm-item">
@@ -7,6 +11,33 @@
       </div>
     </div>
   </div>
+  <!-- <div class="player-button">
+      <div class="wrap">
+        <button (click)="switchPlayer()" mat-icon-button>
+          <i *ngIf="this.readOnly" class="material-icons">
+            radio_button_checked
+          </i>
+          <i  *ngIf="!this.readOnly" class="material-icons">
+            radio_button_unchecked
+          </i>
+        </button>
+          <button (click)="generateCSVPatern()" mat-icon-button>
+            <i class="material-icons">
+                table_chart
+            </i>
+          </button>
+          <button (click)="file.click()" mat-icon-button>
+            <i class="material-icons">
+              folder
+            </i>
+          </button>
+          <button (click)="generateCSVFull()" mat-icon-button>
+            <i class="material-icons">
+              cloud_download
+            </i>
+          </button>
+      </div>
+  </div> -->
   <div class="coco-bpm-graph" id="graph" style="height: calc(100vh - 60px);"></div>
   <!-- <div class="clickShield" *ngIf="showSide" (click)="showSide = false"></div> -->
   <div (click)="showSide = !showSide" class="toggle-sidebar-btn" [ngClass]="{ 'active': showSide }">
@@ -19,8 +50,9 @@
   <div [ngClass]="{ show: showSide }" *ngIf="selectedModal" class="sidebar show">
     <mat-form-field class="example-full-width">
       <mat-label>Id (latin simbols and digits)</mat-label>
-      <input matInput [(ngModel)]="data[selectedModal].id" (keydown)="onKeyDown($event)"
-      (keyup.enter)="onFieldChange($event)" (blur)="onFieldChange($event)"/>
+      <input id="dataId" matInput [(ngModel)]="data[selectedModal].id" (keydown)="onKeyDown($event)"
+      (ngModelChange)="idModelChange($event)"
+      (keyup.enter)="onFieldChangeId($event)" (blur)="onFieldChangeId($event)"/>
     </mat-form-field>
     <mat-form-field class="example-full-width">
       <mat-label>Name</mat-label>
@@ -91,7 +123,7 @@
           <td>
             <mat-form-field *ngIf="(item.value && item.value.charAt(0) !== '=') || !item.value" class="example-full-width table-input">
               <input matInput [(ngModel)]="item.value"
-              (keyup.enter)="onFieldChange($event)" (blur)="onFieldChange($event)" />
+              (keyup.enter)="onFieldChange($event)" (blur)="onFieldChange($event);validValue(item, index)" />
             </mat-form-field>
             <span *ngIf="item.value && item.value.charAt(0) === '=' ">
               f (x)
@@ -100,25 +132,25 @@
           <td>
             <div class="df jc-c">
               <mat-checkbox [(ngModel)]="item.measurable"
-              (keyup.enter)="onFieldChange($event)" (blur)="onFieldChange($event)"></mat-checkbox>
+              (ngModelChange)="onFieldChange($event)"></mat-checkbox>
             </div>
           </td>
           <td>
             <div class="df jc-c">
               <mat-checkbox [(ngModel)]="item.changeable"
-              (keyup.enter)="onFieldChange($event)" (blur)="onFieldChange($event)"></mat-checkbox>
+              (ngModelChange)="onFieldChange($event)" (blur)="onFieldChange($event)"></mat-checkbox>
             </div>
           </td>
           <td>
             <div class="df jc-c">
               <mat-checkbox [(ngModel)]="item.showOnDiagram"
-              (keyup.enter)="onFieldChange($event)" (blur)="onFieldChange($event)"></mat-checkbox>
+              (ngModelChange)="onFieldChange($event)" (blur)="onFieldChange($event)"></mat-checkbox>
             </div>
           </td>
           <td>
             <div class="df jc-c ai-c">
               <button class="table-more-btn" mat-icon-button
-                (click)="optionsModal[item._id + i] = !optionsModal[item._id + i]">
+                (click)="optionsModal[item._id + index] = !optionsModal[item._id + index]">
                 <i class="material-icons-outlined">
                   arrow_drop_down_circle
                 </i>
@@ -126,7 +158,7 @@
             </div>
           </td>
         </tr>
-        <tr *ngIf="optionsModal[item._id + i]">
+        <tr *ngIf="optionsModal[item._id + index]">
           <td colspan="6">
             <mat-accordion>
               <mat-expansion-panel [expanded]="true">
@@ -152,7 +184,7 @@
                   <div class="input-btn-wrap">
                     <mat-form-field *ngIf="item.value && item.value.charAt(0) !== '=' " class="example-full-width">
                       <input matInput placeholder="Value" [(ngModel)]="item.value"
-                      (keyup.enter)="onFieldChange($event)" (blur)="onFieldChange($event)"/>
+                      (keyup.enter)="onFieldChange($event)" (blur)="onFieldChange($event);validValue(item,index)"/>
                     </mat-form-field>
                     <span *ngIf="item.value && item.value.charAt(0) === '=' " class="example-full-width">Value = f (x)</span>
 
@@ -178,22 +210,22 @@
                   </mat-form-field>
                   <div class="chekboxs-list">
                     <mat-checkbox [(ngModel)]="item.measurable"
-                    (keyup.enter)="onFieldChange($event)" (blur)="onFieldChange($event)">Measurable
+                    (ngModelChange)="onFieldChange($event)" (blur)="onFieldChange($event)">Measurable
                     </mat-checkbox>
                     <mat-checkbox [(ngModel)]="item.changeable"
-                    (keyup.enter)="onFieldChange($event)" (blur)="onFieldChange($event)">Changeable
+                    (ngModelChange)="onFieldChange($event)" (blur)="onFieldChange($event)">Changeable
                     </mat-checkbox>
                     <mat-checkbox [(ngModel)]="item.showOnDiagram"
-                    (keyup.enter)="onFieldChange($event)" (blur)="onFieldChange($event)">Show on
+                    (ngModelChange)="onFieldChange($event)" (blur)="onFieldChange($event)">Show on
                       diagram</mat-checkbox>
                     <mat-checkbox [(ngModel)]="item.showName"
-                    (keyup.enter)="onFieldChange($event)" (blur)="onFieldChange($event)">Show name
+                    (ngModelChange)="onFieldChange($event)" (blur)="onFieldChange($event)">Show name
                     </mat-checkbox>
                   </div>
                   <mat-form-field *ngIf="item.showOnDiagram">
                     <mat-label>Control type</mat-label>
                     <mat-select [(ngModel)]="item.controlType"
-                    (keyup.enter)="onFieldChange($event)" (blur)="onFieldChange($event)">
+                    (keyup.enter)="onFieldChange($event);" (blur)="onFieldChange($event);sliderChange($event, item, index)">
                       <mat-option value="Value">
                         Value
                       </mat-option>
